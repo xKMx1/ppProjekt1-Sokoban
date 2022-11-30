@@ -78,7 +78,7 @@ void startScreen()
           << "\n";
 }
 
-void fillMap(char tab[mapY][mapX])
+void fillMap(char tab[mapY][mapX]) // Funkcja tymczasowa, zapełniamy tablicę zerami i haszami
 {
      for (int i = 0; i < mapY; i++)
      {
@@ -96,10 +96,25 @@ void fillMap(char tab[mapY][mapX])
      }
 }
 
-void genMap1()
+void genHero(int y1, int y2, int x1, int x2, char tab[mapY][mapX]) // Dostajemy koordynaty które w przesłanej tablicy zamieniamy na znaki odpowiadające naszemu bohaterowi
+{
+     tab[y1][x1] = 135;
+     tab[y1][x2] = 135;
+     tab[y2][x1] = 135;
+     tab[y2][x2] = 135;
+}
+
+void movement()
+{
+     char ruch = getchar();
+     printf("Przeczytano znak o numerze %i.", ruch);
+}
+
+void genMap1() // wypisujemy na ekran mapę
 {
      char Map[mapY][mapX];
      fillMap(Map);
+     genHero(14, 15, 45, 46, Map);
 
      for (int i = 0; i < mapY; i++)
      {
@@ -114,4 +129,5 @@ int main()
 {
      // startScreen();
      genMap1();
+     movement();
 }
