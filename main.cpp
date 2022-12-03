@@ -2,15 +2,20 @@
 #include <iomanip>
 #include <stdlib.h>
 #include <windows.h>
+#include <conio.h>
 
 using namespace std;
 
-struct level
-{
-};
-
 const int mapX = 80;
 const int mapY = 25;
+
+void ClearScreen()
+{
+     COORD cursorPosition;
+     cursorPosition.X = 0;
+     cursorPosition.Y = 0;
+     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
+}
 
 void startScreen()
 { // funkcja wyswietlajaca ekran powitalny
@@ -27,7 +32,15 @@ void startScreen()
      system("CLS");
 }
 
-void fillMap(char tab[mapY][mapX]) // Funkcja tymczasowa, zapełniamy tablicę zerami i haszami
+void genHero(int y1, int y2, int x1, int x2, char tab[mapY][mapX]) // Dostajemy koordynaty które w przesłanej tablicy zamieniamy na znaki odpowiadające naszemu bohaterowi
+{
+     tab[y1][x1] = 135;
+     tab[y1][x2] = 135;
+     tab[y2][x1] = 135;
+     tab[y2][x2] = 135;
+}
+
+void fillMap1(char tab[mapY][mapX]) // funkcja wypełniająca mapę 1
 {
      for (int i = 0; i < mapY; i++)
      {
@@ -45,63 +58,15 @@ void fillMap(char tab[mapY][mapX]) // Funkcja tymczasowa, zapełniamy tablicę z
      }
 }
 
-void genHero(int y1, int y2, int x1, int x2, char tab[mapY][mapX]) // Dostajemy koordynaty które w przesłanej tablicy zamieniamy na znaki odpowiadające naszemu bohaterowi
+void genMap1(char tab[mapY][mapX]) // wypisujemy na ekran mapę
 {
-     tab[y1][x1] = 135;
-     tab[y1][x2] = 135;
-     tab[y2][x1] = 135;
-     tab[y2][x2] = 135;
-}
-
-void movement()
-{
-     char ruch = getchar();
-     switch (ruch) // Zależnie od wcisniętego klawisza wykonuje instrukcję
-     {             // WSAD (pruszanie się) - początek
-     case 119:     // w
-          cout << "w";
-          break;
-     case 115: // s
-          cout << "s";
-          break;
-     case 97: // a
-          cout << "a";
-          break;
-     case 100: // d
-          cout << "d";
-          break;
-     case 87: // W
-          cout << "W";
-          break;
-     case 83: // S
-          cout << "S";
-          break;
-     case 65: // A
-          cout << "A";
-          break;
-     case 68: // D
-          cout << "D";
-          break;
-          // WSAD - koniec
-     default:
-          cout << "Został wciśnięty nieznany klawisz";
-          break;
-     }
-}
-
-void genMap1() // wypisujemy na ekran mapę
-{
-     system("cls");
-
-     char Map[mapY][mapX];
-     fillMap(Map);
-     genHero(14, 15, 45, 46, Map);
+     ClearScreen();
 
      for (int i = 0; i < mapY; i++)
      {
           for (int j = 0; j < mapX; j++)
           {
-               cout << Map[i][j];
+               cout << tab[i][j];
           }
           cout << "\n";
      }
@@ -116,6 +81,7 @@ int genMenu()
           << "\n";
      cout << "(2) Opusc gre"
           << "\n";
+
      while (1)
      {
           char znak = getchar();
@@ -132,14 +98,80 @@ int genMenu()
           {
                cout << "Wybrales niepoprawny znak! Mozesz wybrac 1 lub 2."
                     << "\n";
+               Sleep(1000);
+               genMenu();
           }
+     }
+}
+
+void action(int *b1, int *b2, int *a1, int *a2)
+{
+     cout << "Wprowadz znak: ";
+     char znak = getch();
+     cout << znak;
+
+     if (znak == 119) // instrukcje dla 'w'
+     {
+          *b1 -= 1;
+          *b2 -= 1;
+     }
+     if (znak == 87) // instrukcje dla 'W'
+     {
+          *b1 -= 1;
+          *b2 -= 1;
+     }
+     if (znak == 115) // instrukcje dla 's'
+     {
+          *b1 += 1;
+          *b2 += 1;
+     }
+     if (znak == 83) // instrukcje dla 'S'
+     {
+          *b1 += 1;
+          *b2 += 1;
+     }
+     if (znak == 97) // instrukcje dla 'a'
+     {
+          *a1 -= 1;
+          *a2 -= 1;
+     }
+     if (znak == 65) // instrukcje dla 'A'
+     {
+          *a1 -= 1;
+          *a2 -= 1;
+     }
+     if (znak == 100) // instrukcje dla 'd'
+     {
+          *a1 += 1;
+          *a2 += 1;
+     }
+     if (znak == 68) // instrukcje dla 'D'
+     {
+          *a1 += 1;
+          *a2 += 1;
      }
 }
 
 int main()
 {
-     startScreen();
-     genMenu();
+     char mainMap[mapY][mapX];
+     int y1 = 14, y2 = 15, x1 = 48, x2 = 49;
+     // startScreen();
 
+     if (genMenu() == 1)
+     {
+          fillMap1(mainMap);
+          genHero(y1, y2, x1, x2, mainMap);
+          genMap1(mainMap);
+          for (int i = 0; i < 50; i++)
+          {
+               action(&y1, &y2, &x1, &x2);
+               fillMap1(mainMap);
+               genHero(y1, y2, x1, x2, mainMap);
+               genMap1(mainMap);
+          }
+     }
+
+     getchar();
      return 0;
 }
