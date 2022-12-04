@@ -3,3 +3,5 @@
 Sokoban
 
 TODO
+
+- Zmienić getch() na getchar()

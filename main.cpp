@@ -46,13 +46,13 @@ void fillMap1(char tab[mapY][mapX]) // funkcja wypełniająca mapę 1
      {
           for (int j = 0; j < mapX; j++)
           {
-               if (i == 0 && j == 0 || i == 0 && j == 79 || i == 24 && j == 0 || i == 24 && j == 79)
+               if (i == 0 || j == 0 || j == 79)
                {
                     tab[i][j] = '#';
                }
                else
                {
-                    tab[i][j] = '0';
+                    tab[i][j] = 32;
                }
           }
      }
@@ -156,8 +156,8 @@ int main()
 {
      char mainMap[mapY][mapX];
      int y1 = 14, y2 = 15, x1 = 48, x2 = 49;
-     // startScreen();
 
+     // startScreen();
      if (genMenu() == 1)
      {
           fillMap1(mainMap);
@@ -172,6 +172,5 @@ int main()
           }
      }
 
-     getchar();
      return 0;
 }
