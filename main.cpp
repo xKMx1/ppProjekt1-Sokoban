@@ -124,7 +124,15 @@ int genMenu()
      }
 }
 
-void action(int *y, int *x, int *b, int *a)
+bool onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2)
+{
+     if ((*cx1 == (*sx1 || *sx2) && *cy1 == (*sy1 || *sy2)) || (*cx2 == (*sx1 || *sx2) && *cy2 == (*sy1 || *sy2)))
+     {
+          return 1;
+     }
+}
+
+void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2)
 {
      cout << "Wprowadz znak: ";
      char znak = getch();
@@ -132,10 +140,15 @@ void action(int *y, int *x, int *b, int *a)
 
      if (znak == 119 || znak == 87) // instrukcje dla "W"
      {
-          if (*y == *b + 3 && *x == *a)
+          if (*y == *cx1 + 3 && *x == *cy1)
           {
                *y -= 3;
-               *b -= 3;
+               *cx1 -= 3;
+          }
+          else if (*y == *cx2 + 3 && *x == *cy2)
+          {
+               *y -= 3;
+               *cx2 -= 3;
           }
           else
           {
@@ -145,10 +158,15 @@ void action(int *y, int *x, int *b, int *a)
 
      if (znak == 115 || znak == 83) // instrukcje dla "S"
      {
-          if (*y == *b - 3 && *x == *a)
+          if (*y == *cx1 - 3 && *x == *cy1)
           {
                *y += 3;
-               *b += 3;
+               *cx1 += 3;
+          }
+          else if (*y == *cx2 - 3 && *x == *cy2)
+          {
+               *y += 3;
+               *cx2 += 3;
           }
           else
           {
@@ -158,10 +176,15 @@ void action(int *y, int *x, int *b, int *a)
 
      if (znak == 97 || znak == 65) // instrukcje dla "A"
      {
-          if (*y == *b && *x == (*a + 3))
+          if (*y == *cx1 && *x == (*cy1 + 3))
           {
                *x -= 3;
-               *a -= 3;
+               *cy1 -= 3;
+          }
+          else if (*y == *cx2 && *x == (*cy2 + 3))
+          {
+               *x -= 3;
+               *cy2 -= 3;
           }
           else
           {
@@ -171,10 +194,15 @@ void action(int *y, int *x, int *b, int *a)
 
      if (znak == 100 || znak == 68) // instrukcje dla "D"
      {
-          if (*y == *b && *x == (*a - 3))
+          if (*y == *cx1 && *x == (*cy1 - 3))
           {
                *x += 3;
-               *a += 3;
+               *cy1 += 3;
+          }
+          else if (*y == *cx2 && *x == (*cy2 - 3))
+          {
+               *x += 3;
+               *cy2 += 3;
           }
           else
           {
@@ -187,22 +215,15 @@ void level(int lvl, char tab[mapY][mapX])
 {
      if (lvl == 1)
      {
-          int heroX = 48, heroY = 5;
+          int heroX = 24, heroY = 17;
           int chestOneX = 39, chestOneY = 8;
           int chestTwoX = 39, chestTwoY = 11;
           int spotOneX = 27, spotOneY = 5;
           int spotTwoX = 30, spotTwoY = 5;
+          int steps = 500;
 
-          fillMap1(tab);
-          genBlock(heroY, heroX, tab, 2);
-          genBlock(chestOneY, chestOneX, tab, 1);
-          genBlock(chestTwoY, chestTwoX, tab, 1);
-          genBlock(spotOneY, spotOneX, tab, 0);
-          genBlock(spotTwoY, spotTwoX, tab, 0);
-          genMap1(tab);
-          for (int i = 0; i < 500; i++)
+          for (int i = 0; i < steps; i++)
           {
-               action(&heroY, &heroX, &chestOneY, &chestOneX);
                fillMap1(tab);
                genBlock(heroY, heroX, tab, 2);
                genBlock(chestOneY, chestOneX, tab, 1);
@@ -210,6 +231,13 @@ void level(int lvl, char tab[mapY][mapX])
                genBlock(spotOneY, spotOneX, tab, 0);
                genBlock(spotTwoY, spotTwoX, tab, 0);
                genMap1(tab);
+               action(&heroY, &heroX, &chestOneY, &chestOneX, &chestTwoY, &chestTwoX);
+               if (onSpot(&chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY))
+               {
+                    tab[24][79] = 45;
+               }
+               genMap1(tab);
+               Sleep(1000);
           }
      }
 }
