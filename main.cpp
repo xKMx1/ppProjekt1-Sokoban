@@ -33,35 +33,24 @@ void startScreen()
      system("CLS");
 }
 
-void genHero(int y, int x, char tab[mapY][mapX]) // Dostajemy koordynaty które w przesłanej tablicy zamieniamy na znaki odpowiadające naszemu bohaterowi
+void genBlock(int y, int x, char tab[mapY][mapX], int var)
 {
      for (int i = 0; i < 3; i++)
      {
           for (int j = 0; j < 3; j++)
           {
-               tab[y + i][x + j] = 135;
-          }
-     }
-}
-
-void genChest(int y, int x, char tab[mapY][mapX])
-{
-     for (int i = 0; i < 3; i++)
-     {
-          for (int j = 0; j < 3; j++)
-          {
-               tab[y + i][x + j] = 35;
-          }
-     }
-}
-
-void genSpot(int y, int x, char tab[mapY][mapX])
-{
-     for (int i = 0; i < 3; i++)
-     {
-          for (int j = 0; j < 3; j++)
-          {
-               tab[y + i][x + j] = 38;
+               if (var == 0)
+               { // generate spot
+                    tab[y + i][x + j] = 38;
+               }
+               else if (var == 1)
+               { // generate chest
+                    tab[y + i][x + j] = 35;
+               }
+               else if (var == 2)
+               { // generate hero
+                    tab[y + i][x + j] = 135;
+               }
           }
      }
 }
@@ -69,7 +58,7 @@ void genSpot(int y, int x, char tab[mapY][mapX])
 void fillMap1(char tab[mapY][mapX]) // funkcja wypełniająca mapę 1
 {
      fstream file;
-     char znak;
+
      file.open("blank.txt");
 
      if (!file)
@@ -97,16 +86,10 @@ void genMap1(char tab[mapY][mapX]) // wypisujemy na ekran mapę
      {
           for (int j = 0; j < mapX; j++)
           {
-               if (tab[i][j] == 10)
-               {
-               }
-               else
-               {
-                    cout << tab[i][j];
-               }
+               cout << tab[i][j];
           }
-          cout << "\n";
      }
+     cout << "\n";
 }
 
 int genMenu()
@@ -200,30 +183,46 @@ void action(int *y, int *x, int *b, int *a)
      }
 }
 
+void level(int lvl, char tab[mapY][mapX])
+{
+     if (lvl == 1)
+     {
+          int heroX = 48, heroY = 5;
+          int chestOneX = 39, chestOneY = 8;
+          int chestTwoX = 39, chestTwoY = 11;
+          int spotOneX = 27, spotOneY = 5;
+          int spotTwoX = 30, spotTwoY = 5;
+
+          fillMap1(tab);
+          genBlock(heroY, heroX, tab, 2);
+          genBlock(chestOneY, chestOneX, tab, 1);
+          genBlock(chestTwoY, chestTwoX, tab, 1);
+          genBlock(spotOneY, spotOneX, tab, 0);
+          genBlock(spotTwoY, spotTwoX, tab, 0);
+          genMap1(tab);
+          for (int i = 0; i < 500; i++)
+          {
+               action(&heroY, &heroX, &chestOneY, &chestOneX);
+               fillMap1(tab);
+               genBlock(heroY, heroX, tab, 2);
+               genBlock(chestOneY, chestOneX, tab, 1);
+               genBlock(chestTwoY, chestTwoX, tab, 1);
+               genBlock(spotOneY, spotOneX, tab, 0);
+               genBlock(spotTwoY, spotTwoX, tab, 0);
+               genMap1(tab);
+          }
+     }
+}
+
 int main()
 {
      char mainMap[mapY][mapX];
-     int y = 5, x = 48;
-     int a = 39, b = 8;
-     int n = 5, m = 27;
 
      // startScreen();
+
      if (genMenu() == 1)
      {
-          fillMap1(mainMap);
-          genHero(y, x, mainMap);
-          genChest(b, a, mainMap);
-          genSpot(n, m, mainMap);
-          genMap1(mainMap);
-          for (int i = 0; i < 500; i++)
-          {
-               action(&y, &x, &b, &a);
-               fillMap1(mainMap);
-               genHero(y, x, mainMap);
-               genChest(b, a, mainMap);
-               genSpot(m, n, mainMap);
-               genMap1(mainMap);
-          }
+          level(1, mainMap);
      }
 
      return 0;
