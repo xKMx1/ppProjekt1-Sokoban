@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <conio.h>
+#include <fstream>
 
 using namespace std;
 
@@ -54,22 +55,38 @@ void genChest(int y, int x, char tab[mapY][mapX])
      }
 }
 
+void genSpot(int y, int x, char tab[mapY][mapX])
+{
+     for (int i = 0; i < 3; i++)
+     {
+          for (int j = 0; j < 3; j++)
+          {
+               tab[y + i][x + j] = 38;
+          }
+     }
+}
+
 void fillMap1(char tab[mapY][mapX]) // funkcja wypełniająca mapę 1
 {
+     fstream file;
+     char znak;
+     file.open("blank.txt");
+
+     if (!file)
+     {
+          cout << "Pobranie mapy z pliku się nie powiodło";
+          exit(0);
+     }
+
      for (int i = 0; i < mapY; i++)
      {
           for (int j = 0; j < mapX; j++)
           {
-               if (i == 0 || i == 1 || i == 24 || i == 23 || j == 0 || j == 79 || (j == 1 && i > 30 && i < 60))
-               {
-                    tab[i][j] = 178;
-               }
-               else
-               {
-                    tab[i][j] = 32;
-               }
+               tab[i][j] = file.get();
           }
      }
+
+     file.close();
 }
 
 void genMap1(char tab[mapY][mapX]) // wypisujemy na ekran mapę
@@ -80,7 +97,13 @@ void genMap1(char tab[mapY][mapX]) // wypisujemy na ekran mapę
      {
           for (int j = 0; j < mapX; j++)
           {
-               cout << tab[i][j];
+               if (tab[i][j] == 10)
+               {
+               }
+               else
+               {
+                    cout << tab[i][j];
+               }
           }
           cout << "\n";
      }
@@ -180,8 +203,9 @@ void action(int *y, int *x, int *b, int *a)
 int main()
 {
      char mainMap[mapY][mapX];
-     int y = 14, x = 48;
-     int a = 6, b = 8;
+     int y = 5, x = 48;
+     int a = 39, b = 8;
+     int n = 5, m = 27;
 
      // startScreen();
      if (genMenu() == 1)
@@ -189,6 +213,7 @@ int main()
           fillMap1(mainMap);
           genHero(y, x, mainMap);
           genChest(b, a, mainMap);
+          genSpot(n, m, mainMap);
           genMap1(mainMap);
           for (int i = 0; i < 500; i++)
           {
@@ -196,6 +221,7 @@ int main()
                fillMap1(mainMap);
                genHero(y, x, mainMap);
                genChest(b, a, mainMap);
+               genSpot(m, n, mainMap);
                genMap1(mainMap);
           }
      }

@@ -5,3 +5,4 @@ Sokoban
 TODO
 
 - Zmienić getch() na getchar()
+- Naprawić generowanie menu przy błędnych znakach
