@@ -32,12 +32,26 @@ void startScreen()
      system("CLS");
 }
 
-void genHero(int y1, int y2, int x1, int x2, char tab[mapY][mapX]) // Dostajemy koordynaty które w przesłanej tablicy zamieniamy na znaki odpowiadające naszemu bohaterowi
+void genHero(int y, int x, char tab[mapY][mapX]) // Dostajemy koordynaty które w przesłanej tablicy zamieniamy na znaki odpowiadające naszemu bohaterowi
 {
-     tab[y1][x1] = 135;
-     tab[y1][x2] = 135;
-     tab[y2][x1] = 135;
-     tab[y2][x2] = 135;
+     for (int i = 0; i < 3; i++)
+     {
+          for (int j = 0; j < 3; j++)
+          {
+               tab[y + i][x + j] = 135;
+          }
+     }
+}
+
+void genChest(int y, int x, char tab[mapY][mapX])
+{
+     for (int i = 0; i < 3; i++)
+     {
+          for (int j = 0; j < 3; j++)
+          {
+               tab[y + i][x + j] = 35;
+          }
+     }
 }
 
 void fillMap1(char tab[mapY][mapX]) // funkcja wypełniająca mapę 1
@@ -46,9 +60,9 @@ void fillMap1(char tab[mapY][mapX]) // funkcja wypełniająca mapę 1
      {
           for (int j = 0; j < mapX; j++)
           {
-               if (i == 0 || j == 0 || j == 79)
+               if (i == 0 || i == 1 || i == 24 || i == 23 || j == 0 || j == 79 || (j == 1 && i > 30 && i < 60))
                {
-                    tab[i][j] = '#';
+                    tab[i][j] = 178;
                }
                else
                {
@@ -104,70 +118,84 @@ int genMenu()
      }
 }
 
-void action(int *b1, int *b2, int *a1, int *a2)
+void action(int *y, int *x, int *b, int *a)
 {
      cout << "Wprowadz znak: ";
      char znak = getch();
      cout << znak;
 
-     if (znak == 119) // instrukcje dla 'w'
+     if (znak == 119 || znak == 87) // instrukcje dla "W"
      {
-          *b1 -= 1;
-          *b2 -= 1;
+          if (*y == *b + 3 && *x == *a)
+          {
+               *y -= 3;
+               *b -= 3;
+          }
+          else
+          {
+               *y -= 3;
+          }
      }
-     if (znak == 87) // instrukcje dla 'W'
+
+     if (znak == 115 || znak == 83) // instrukcje dla "S"
      {
-          *b1 -= 1;
-          *b2 -= 1;
+          if (*y == *b - 3 && *x == *a)
+          {
+               *y += 3;
+               *b += 3;
+          }
+          else
+          {
+               *y += 3;
+          }
      }
-     if (znak == 115) // instrukcje dla 's'
+
+     if (znak == 97 || znak == 65) // instrukcje dla "A"
      {
-          *b1 += 1;
-          *b2 += 1;
+          if (*y == *b && *x == (*a + 3))
+          {
+               *x -= 3;
+               *a -= 3;
+          }
+          else
+          {
+               *x -= 3;
+          }
      }
-     if (znak == 83) // instrukcje dla 'S'
+
+     if (znak == 100 || znak == 68) // instrukcje dla "D"
      {
-          *b1 += 1;
-          *b2 += 1;
-     }
-     if (znak == 97) // instrukcje dla 'a'
-     {
-          *a1 -= 1;
-          *a2 -= 1;
-     }
-     if (znak == 65) // instrukcje dla 'A'
-     {
-          *a1 -= 1;
-          *a2 -= 1;
-     }
-     if (znak == 100) // instrukcje dla 'd'
-     {
-          *a1 += 1;
-          *a2 += 1;
-     }
-     if (znak == 68) // instrukcje dla 'D'
-     {
-          *a1 += 1;
-          *a2 += 1;
+          if (*y == *b && *x == (*a - 3))
+          {
+               *x += 3;
+               *a += 3;
+          }
+          else
+          {
+               *x += 3;
+          }
      }
 }
 
 int main()
 {
      char mainMap[mapY][mapX];
-     int y1 = 14, y2 = 15, x1 = 48, x2 = 49;
+     int y = 14, x = 48;
+     int a = 6, b = 8;
 
      // startScreen();
      if (genMenu() == 1)
      {
           fillMap1(mainMap);
-          genHero(y1, y2, x1, x2, mainMap);
+          genHero(y, x, mainMap);
+          genChest(b, a, mainMap);
           genMap1(mainMap);
-          for (int i = 0; i < 50; i++)
+          for (int i = 0; i < 500; i++)
           {
-               action(&y1, &y2, &x1, &x2);
+               action(&y, &x, &b, &a);
                fillMap1(mainMap);
-               genHero(y1, y2, x1, x2, mainMap);
+               genHero(y, x, mainMap);
+               genChest(b, a, mainMap);
                genMap1(mainMap);
           }
      }
