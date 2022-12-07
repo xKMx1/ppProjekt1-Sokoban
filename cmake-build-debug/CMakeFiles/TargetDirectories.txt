@@ -1,0 +1,3 @@
+C:/Users/Kuba/CLionProjects/Kamil Sokoban/Sokoban-kmx/cmake-build-debug/CMakeFiles/Sokoban_kmx.dir
+C:/Users/Kuba/CLionProjects/Kamil Sokoban/Sokoban-kmx/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Kuba/CLionProjects/Kamil Sokoban/Sokoban-kmx/cmake-build-debug/CMakeFiles/rebuild_cache.dir
