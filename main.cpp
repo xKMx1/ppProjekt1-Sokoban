@@ -102,7 +102,7 @@ int genMenu()
      cout << "(2) Opusc gre"
           << "\n";
 
-     while (1)
+     while (true)
      {
           char znak = getchar();
 
