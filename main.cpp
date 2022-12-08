@@ -2,12 +2,12 @@
 #include <windows.h>
 #include <conio.h>
 #include <fstream>
+#include <stack>
 
 using namespace std;
 
 const int mapX = 80;
 const int mapY = 25;
-const int replaySize = 10;
 
 struct poziom {
     char mainMap[mapY][mapX];
@@ -23,13 +23,8 @@ struct poziom {
     int spotTwoY;
 };
 
-int undoSize = 0;
-int redoSize = 0;
-
-
-char undoArray[replaySize][mapY][mapX];
-char redoArray[replaySize][mapY][mapX];
-
+stack<poziom> undoStack;
+stack<poziom> redoStack;
 
 void clearScreen() {
     COORD cursorPosition;
@@ -132,28 +127,19 @@ int genMenu() {
 }
 
 void
-loadGameProgress(poziom poziom) {
-    //TODO probably move / change name
-    //copy save from state stack
-    //undoArray.pop();
-    char save[mapY][mapX];
-    copyMaps(save, undoArray[0]);
+redo(poziom *poziom) {
+    if (undoStack.size() > 1) {
+        undoStack.pop();
 
-    //move previous state to redo and clean undo
-    copyMaps(redoArray[0], poziom.mainMap);
-    //redoArray[redoSize] = mainMap;
-    redoSize++;
+        redoStack.push(*poziom);
 
-    undoSize--;
-    //TODO possible fuckups with pops
-
-    //update main map
-    copyMaps(poziom.mainMap, save);
-    genMap1(poziom.mainMap);
+        *poziom = undoStack.top();
+        undoStack.pop();
+    }
 }
 
 
-void action(int *y, int *x, int *b, int *a, poziom poziom) {
+void action(int *y, int *x, int *b, int *a, poziom *poziom) {
     cout << "Wprowadz znak: ";
     char znak = getch();
     cout << znak;
@@ -199,15 +185,13 @@ void action(int *y, int *x, int *b, int *a, poziom poziom) {
     }
 
     if (znak == 'z' || znak == 'Z') {
-        loadGameProgress(poziom);
+        redo(poziom);
     }
 
 }
 
 void saveGameProgress(poziom poziom) {
-    //wyglad mapy
-    copyMaps(undoArray[undoSize], poziom.mainMap);
-    undoSize++;//TODO wszystkie kolejki cofania
+    undoStack.push(poziom);
 }
 
 void level(int lvl, poziom poziom) {
@@ -231,9 +215,10 @@ void level(int lvl, poziom poziom) {
         genBlock(poziom.spotOneY, poziom.spotOneX, &poziom, 0);
         genBlock(poziom.spotTwoY, poziom.spotTwoX, &poziom, 0);
         genMap1(poziom.mainMap);
+        saveGameProgress(poziom);
         for (int i = 0; i < 500; i++) {
-            action(&poziom.heroY, &poziom.heroX, &poziom.chestOneY, &poziom.chestOneX, poziom);
-            fillMap1(&poziom);//TODO to jest shady
+            action(&poziom.heroY, &poziom.heroX, &poziom.chestOneY, &poziom.chestOneX, &poziom);
+            fillMap1(&poziom);
             genBlock(poziom.heroY, poziom.heroX, &poziom, 2);
             genBlock(poziom.chestOneY, poziom.chestOneX, &poziom, 1);
             genBlock(poziom.chestTwoY, poziom.chestTwoX, &poziom, 1);
