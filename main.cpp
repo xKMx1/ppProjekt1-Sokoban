@@ -33,22 +33,22 @@ void startScreen()
      system("CLS");
 }
 
-void genBlock(int y, int x, char tab[mapY][mapX], int var)
+void genBlock(int y, int x, char tab[mapY][mapX], int var, int *chest)
 {
-     for (int i = 0; i < 3; i++)
+     for (int i = 0; i < 3; i++) // generujemy blok 3x3 razem z koleinym forem
      {
           for (int j = 0; j < 3; j++)
           {
-               if (var == 0)
-               { // generate spot
+               if (var == 0) // jeśli zostało podane 0 na wejście generujemy miejsce spotu
+               {
                     tab[y + i][x + j] = 32;
                }
-               else if (var == 1)
-               { // generate chest
-                    tab[y + i][x + j] = 35;
+               else if (var == 1) // jeśli została podana na wejście jedynka generujemy skrzynię
+               {
+                    tab[y + i][x + j] = *chest;
                }
-               else if (var == 2)
-               { // generate hero
+               else if (var == 2) // jeśli została podana na wejście dwójka generujemy bohatera
+               {
                     tab[y + i][x + j] = 135;
                }
           }
@@ -78,7 +78,7 @@ void fillMap1(char tab[mapY][mapX]) // funkcja wypełniająca mapę 1
      file.close();
 }
 
-void genMap1(char tab[mapY][mapX]) // wypisujemy na ekran mapę
+void genMap(char tab[mapY][mapX]) // wypisujemy na ekran mapę
 {
      ClearScreen();
 
@@ -124,27 +124,24 @@ int genMenu()
      }
 }
 
-void onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2)
+void onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int *chest1, int *chest2)
 {
-     if (*cx1 == *sx1 && *cy1 == *sy1) // Sprawdza czy pierwsza skrzynia znajduje się na pierwszym miejscu docelowym
+     if ((*cx1 == *sx1 && *cy1 == *sy1) || (*cx1 == *sx2 && *cy1 == *sy2)) // Sprawdza czy pierwsza skrzynia znajduje się na pierwszym miejscu docelowym
      {
-          cout << "jeden jedne";
+          *chest1 = 36;
      }
-     if (*cx1 == *sx2 && *cy1 == *sy2) // Sprawdza czy pierwsza skrzynia znajduje się na drugim miejscu docelowym
+     else
+          *chest1 = 35;
+
+     if ((*cx2 == *sx1 && *cy2 == *sy1) || (*cx2 == *sx2 && *cy2 == *sy2)) // Sprawdza czy druga skrzynia znajduje się na pierwszym miejscu docelowym
      {
-          cout << "jeden dwa";
+          *chest2 = 36;
      }
-     if (*cx2 == *sx1 && *cy2 == *sy1) // Sprawdza czy druga skrzynia znajduje się na pierwszym miejscu docelowym
-     {
-          cout << "dwa jeden";
-     }
-     if (*cx2 == *sx2 && *cy2 == *sy2) // Sprawdza czy druga skrzynia znajduje się na drugim miejscu docelowym
-     {
-          cout << "dwa dwa";
-     }
+     else
+          *chest2 = 35;
 }
 
-void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, char tab[mapY][mapX])
+void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int *chest1, int *chest2, char tab[mapY][mapX])
 {
      cout << "Wprowadz znak: ";
      char znak = getch();
@@ -259,7 +256,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
           }
      }
 
-     onSpot(cx1, cy1, cx2, cy2, sx1, sy1, sx2, sy2);
+     onSpot(cx1, cy1, cx2, cy2, sx1, sy1, sx2, sy2, chest1, chest2);
 }
 
 void level(int lvl, char tab[mapY][mapX])
@@ -271,18 +268,21 @@ void level(int lvl, char tab[mapY][mapX])
           int chestTwoX = 39, chestTwoY = 11;
           int spotOneX = 27, spotOneY = 5;
           int spotTwoX = 30, spotTwoY = 5;
+          int chest1 = 35;
+          int chest2 = 35;
           int steps = 500;
 
-          for (int i = 0; i < steps; i++)
+          for (int i = 1; i < steps + 1; i++)
           {
                fillMap1(tab);
-               genBlock(spotOneY, spotOneX, tab, 0);
-               genBlock(spotTwoY, spotTwoX, tab, 0);
-               genBlock(heroY, heroX, tab, 2);
-               genBlock(chestOneY, chestOneX, tab, 1);
-               genBlock(chestTwoY, chestTwoX, tab, 1);
-               genMap1(tab);
-               action(&heroY, &heroX, &chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY, tab);
+               genBlock(spotOneY, spotOneX, tab, 0, &chest1);
+               genBlock(spotTwoY, spotTwoX, tab, 0, &chest2);
+               genBlock(heroY, heroX, tab, 2, &chest1);
+               genBlock(chestOneY, chestOneX, tab, 1, &chest1);
+               genBlock(chestTwoY, chestTwoX, tab, 1, &chest2);
+               cout << (steps - i); // wypisujemy na ekran pozostałe kroki
+               genMap(tab);
+               action(&heroY, &heroX, &chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY, &chest1, &chest2, tab);
           }
      }
 }
