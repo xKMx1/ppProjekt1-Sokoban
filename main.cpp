@@ -60,15 +60,15 @@ void startScreen() { // funkcja wyswietlajaca ekran powitalny
     system("CLS");
 }
 
-void genBlock(int y, int x, poziom poziom, int var) {
+void genBlock(int y, int x, poziom *poziom, int var) {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             if (var == 0) { // generate spot
-                poziom.mainMap[y + i][x + j] = 38;
+                poziom->mainMap[y + i][x + j] = 38;
             } else if (var == 1) { // generate chest
-                poziom.mainMap[y + i][x + j] = 35;
+                poziom->mainMap[y + i][x + j] = 35;
             } else if (var == 2) { // generate hero
-                poziom.mainMap[y + i][x + j] = 135;
+                poziom->mainMap[y + i][x + j] = 135;
             }
         }
     }
@@ -225,20 +225,20 @@ void level(int lvl, poziom poziom) {
         poziom.spotTwoY = 5;
 
         fillMap1(&poziom);
-        genBlock(poziom.heroY, poziom.heroX, poziom, 2);
-        genBlock(poziom.chestOneY, poziom.chestOneX, poziom, 1);
-        genBlock(poziom.chestTwoY, poziom.chestTwoX, poziom, 1);
-        genBlock(poziom.spotOneY, poziom.spotOneX, poziom, 0);
-        genBlock(poziom.spotTwoY, poziom.spotTwoX, poziom, 0);
+        genBlock(poziom.heroY, poziom.heroX, &poziom, 2);
+        genBlock(poziom.chestOneY, poziom.chestOneX, &poziom, 1);
+        genBlock(poziom.chestTwoY, poziom.chestTwoX, &poziom, 1);
+        genBlock(poziom.spotOneY, poziom.spotOneX, &poziom, 0);
+        genBlock(poziom.spotTwoY, poziom.spotTwoX, &poziom, 0);
         genMap1(poziom.mainMap);
         for (int i = 0; i < 500; i++) {
             action(&poziom.heroY, &poziom.heroX, &poziom.chestOneY, &poziom.chestOneX, poziom);
             fillMap1(&poziom);//TODO to jest shady
-            genBlock(poziom.heroY, poziom.heroX, poziom, 2);
-            genBlock(poziom.chestOneY, poziom.chestOneX, poziom, 1);
-            genBlock(poziom.chestTwoY, poziom.chestTwoX, poziom, 1);
-            genBlock(poziom.spotOneY, poziom.spotOneX, poziom, 0);
-            genBlock(poziom.spotTwoY, poziom.spotTwoX, poziom, 0);
+            genBlock(poziom.heroY, poziom.heroX, &poziom, 2);
+            genBlock(poziom.chestOneY, poziom.chestOneX, &poziom, 1);
+            genBlock(poziom.chestTwoY, poziom.chestTwoX, &poziom, 1);
+            genBlock(poziom.spotOneY, poziom.spotOneX, &poziom, 0);
+            genBlock(poziom.spotTwoY, poziom.spotTwoX, &poziom, 0);
             genMap1(poziom.mainMap);
             saveGameProgress(poziom);
         }
