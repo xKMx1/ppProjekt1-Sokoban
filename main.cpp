@@ -137,11 +137,25 @@ void undo(poziom *poziom) {
     }
 }
 
+void redo(poziom *poziom) {
+    //TODO dodac czyszczenie redoStack po ruchu?
+    if (!redoStack.empty()) {
+        undoStack.pop();
+
+        undoStack.push(*poziom);
+
+        *poziom = redoStack.top();
+        redoStack.pop();
+    }
+}
+
 
 void action(int *y, int *x, int *b, int *a, poziom *poziom) {
     cout << "Wprowadz znak: ";
     char znak = getch();
     cout << znak;
+
+    //TODO dodac zabezbieczenie przeciwko zapisowi w przypadku, gdy nacisniety niepoprawny klawisz
 
     if (znak == 'w' || znak == 'W') // instrukcje dla "W"
     {
@@ -183,8 +197,12 @@ void action(int *y, int *x, int *b, int *a, poziom *poziom) {
         }
     }
 
-    if (znak == 'z' || znak == 'Z') {
+    if (znak == 'u' || znak == 'U') {
         undo(poziom);
+    }
+
+    if (znak == 'r' || znak == 'R') {
+        redo(poziom);
     }
 
 }
