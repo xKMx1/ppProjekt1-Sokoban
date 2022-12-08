@@ -2,17 +2,33 @@
 #include <windows.h>
 #include <conio.h>
 #include <fstream>
-#include <stack>
 
 using namespace std;
 
 const int mapX = 80;
 const int mapY = 25;
+const int replaySize = 10;
 
-char mainMap[mapY][mapX];
+struct poziom {
+    char mainMap[mapY][mapX];
+    int heroX;
+    int heroY;
+    int chestOneX;
+    int chestOneY;
+    int chestTwoX;
+    int chestTwoY;
+    int spotOneX;
+    int spotOneY;
+    int spotTwoX;
+    int spotTwoY;
+};
 
-stack<char (*)[mapX]> undoStack;//C++ jest dziwny i nie mam pojecia co robie
-stack<char (*)[mapX]> redoStack;
+int undoSize = 0;
+int redoSize = 0;
+
+
+char undoArray[replaySize][mapY][mapX];//C++ jest dziwny i nie mam pojecia co robie
+char redoArray[replaySize][mapY][mapX];
 
 
 void clearScreen() {
@@ -23,8 +39,8 @@ void clearScreen() {
 }
 
 void copyMaps(char changeMap[mapY][mapX], char sourceMap[mapY][mapX]) {
-    for (int i = 0; i < mapY; ++i) {
-        for (int j = 0; j < mapX; ++j) {
+    for (int i = 0; i < mapY; i++) {
+        for (int j = 0; j < mapX; j++) {
             changeMap[i][j] = sourceMap[i][j];
         }
     }
@@ -58,7 +74,7 @@ void genBlock(int y, int x, char tab[mapY][mapX], int var) {
     }
 }
 
-void fillMap1() // funkcja wypełniająca mapę 1
+void fillMap1(poziom poziom) // funkcja wypełniająca mapę 1
 {
     fstream file;
 
@@ -71,7 +87,7 @@ void fillMap1() // funkcja wypełniająca mapę 1
 
     for (int i = 0; i < mapY; i++) {
         for (int j = 0; j < mapX; j++) {
-            mainMap[i][j] = file.get();
+            poziom.mainMap[i][j] = file.get();
         }
     }
 
@@ -115,30 +131,29 @@ int genMenu() {
     }
 }
 
-void loadGameProgress() {
+void
+loadGameProgress(poziom poziom) {
     //TODO probably move / change name
     //copy save from state stack
-    undoStack.pop();
+    //undoArray.pop();
     char save[mapY][mapX];
-    copyMaps(save, undoStack.top());
+    copyMaps(save, undoArray[0]);
 
     //move previous state to redo and clean undo
-    redoStack.push(mainMap);
-    undoStack.pop();
+    copyMaps(redoArray[0], poziom.mainMap);
+    //redoArray[redoSize] = mainMap;
+    redoSize++;
+
+    undoSize--;
     //TODO possible fuckups with pops
 
     //update main map
-    copyMaps(mainMap, save);
-    genMap1(mainMap);
+    copyMaps(poziom.mainMap, save);
+    genMap1(poziom.mainMap);
 }
 
-void undo() {
-    if (!undoStack.empty()) {
-        loadGameProgress();
-    }
-}
 
-void action(int *y, int *x, int *b, int *a) {
+void action(int *y, int *x, int *b, int *a, poziom poziom) {
     cout << "Wprowadz znak: ";
     char znak = getch();
     cout << znak;
@@ -184,54 +199,59 @@ void action(int *y, int *x, int *b, int *a) {
     }
 
     if (znak == 'z' || znak == 'Z') {
-        undo();
+        loadGameProgress(poziom);
     }
 
 }
 
-void saveGameProgress() {
-    char save[mapY][mapX];
-
-    copyMaps(save, mainMap);
-
-    undoStack.push(save);
+void saveGameProgress(poziom poziom) {
+    //wyglad mapy
+    copyMaps(undoArray[undoSize], poziom.mainMap);
+    undoSize++;//TODO wszystkie kolejki cofania
 }
 
-void level(int lvl, char tab[mapY][mapX]) {
+void level(int lvl, poziom poziom) {
     if (lvl == 1) {
-        int heroX = 48, heroY = 5;
-        int chestOneX = 39, chestOneY = 8;
-        int chestTwoX = 39, chestTwoY = 11;
-        int spotOneX = 27, spotOneY = 5;
-        int spotTwoX = 30, spotTwoY = 5;
 
-        fillMap1();
-        genBlock(heroY, heroX, tab, 2);
-        genBlock(chestOneY, chestOneX, tab, 1);
-        genBlock(chestTwoY, chestTwoX, tab, 1);
-        genBlock(spotOneY, spotOneX, tab, 0);
-        genBlock(spotTwoY, spotTwoX, tab, 0);
-        genMap1(tab);
+        poziom.heroX = 48;
+        poziom.heroY = 5;
+        poziom.chestOneX = 39;
+        poziom.chestOneY = 8;
+        poziom.chestTwoX = 39;
+        poziom.chestTwoY = 11;
+        poziom.spotOneX = 27;
+        poziom.spotOneY = 5;
+        poziom.spotTwoX = 30;
+        poziom.spotTwoY = 5;
+
+        fillMap1(poziom);
+        genBlock(poziom.heroY, poziom.heroX, poziom.mainMap, 2);
+        genBlock(poziom.chestOneY, poziom.chestOneX, poziom.mainMap, 1);
+        genBlock(poziom.chestTwoY, poziom.chestTwoX, poziom.mainMap, 1);
+        genBlock(poziom.spotOneY, poziom.spotOneX, poziom.mainMap, 0);
+        genBlock(poziom.spotTwoY, poziom.spotTwoX, poziom.mainMap, 0);
+        genMap1(poziom.mainMap);
         for (int i = 0; i < 500; i++) {
-            action(&heroY, &heroX, &chestOneY, &chestOneX);
-            fillMap1();
-            genBlock(heroY, heroX, tab, 2);
-            genBlock(chestOneY, chestOneX, tab, 1);
-            genBlock(chestTwoY, chestTwoX, tab, 1);
-            genBlock(spotOneY, spotOneX, tab, 0);
-            genBlock(spotTwoY, spotTwoX, tab, 0);
-            genMap1(tab);
-            saveGameProgress();
+            action(&poziom.heroY, &poziom.heroX, &poziom.chestOneY, &poziom.chestOneX, poziom);
+            fillMap1(poziom);//TODO to jest shady
+            genBlock(poziom.heroY, poziom.heroX, poziom.mainMap, 2);
+            genBlock(poziom.chestOneY, poziom.chestOneX, poziom.mainMap, 1);
+            genBlock(poziom.chestTwoY, poziom.chestTwoX, poziom.mainMap, 1);
+            genBlock(poziom.spotOneY, poziom.spotOneX, poziom.mainMap, 0);
+            genBlock(poziom.spotTwoY, poziom.spotTwoX, poziom.mainMap, 0);
+            genMap1(poziom.mainMap);
+            saveGameProgress(poziom);
         }
     }
 }
 
 int main() {
+    poziom poziom;
 
     // startScreen();
 
     if (genMenu() == 1) {
-        level(1, mainMap);
+        level(1, poziom);
     }
 
     return 0;
