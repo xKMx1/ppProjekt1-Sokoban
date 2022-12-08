@@ -7,3 +7,4 @@ TODO
 - Zmienić getch() na getchar()
 - Naprawić generowanie menu przy błędnych znakach
 - Dodać nienachodzenie na siebie skrzyń
+- usunąć biblioteki z .h c.

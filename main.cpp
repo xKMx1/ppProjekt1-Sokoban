@@ -41,7 +41,7 @@ void genBlock(int y, int x, char tab[mapY][mapX], int var)
           {
                if (var == 0)
                { // generate spot
-                    tab[y + i][x + j] = 38;
+                    tab[y + i][x + j] = 32;
                }
                else if (var == 1)
                { // generate chest
@@ -124,15 +124,23 @@ int genMenu()
      }
 }
 
-bool onSpot(int cx1, int cy1, int cx2, int cy2, int sx1, int sy1, int sx2, int sy2)
+void onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2)
 {
-     if ((cx1 == (sx1 || sx2) && cy1 == (sy1 || sy2)) || (cx2 == (sx1 || sx2) && cy2 == (sy1 || sy2)))
+     if (*cx1 == *sx1 && *cy1 == *sy1) // Sprawdza czy pierwsza skrzynia znajduje się na pierwszym miejscu docelowym
      {
-          return true;
+          cout << "jeden jedne";
      }
-     else
+     if (*cx1 == *sx2 && *cy1 == *sy2) // Sprawdza czy pierwsza skrzynia znajduje się na drugim miejscu docelowym
      {
-          return false;
+          cout << "jeden dwa";
+     }
+     if (*cx2 == *sx1 && *cy2 == *sy1) // Sprawdza czy druga skrzynia znajduje się na pierwszym miejscu docelowym
+     {
+          cout << "dwa jeden";
+     }
+     if (*cx2 == *sx2 && *cy2 == *sy2) // Sprawdza czy druga skrzynia znajduje się na drugim miejscu docelowym
+     {
+          cout << "dwa dwa";
      }
 }
 
@@ -251,10 +259,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
           }
      }
 
-     if (onSpot(*cx1, *cy1, *cx2, *cy2, *sx1, *sy1, *sx2, *sy2))
-     {
-          tab[0][0] = 65;
-     }
+     onSpot(cx1, cy1, cx2, cy2, sx1, sy1, sx2, sy2);
 }
 
 void level(int lvl, char tab[mapY][mapX])
@@ -271,11 +276,11 @@ void level(int lvl, char tab[mapY][mapX])
           for (int i = 0; i < steps; i++)
           {
                fillMap1(tab);
+               genBlock(spotOneY, spotOneX, tab, 0);
+               genBlock(spotTwoY, spotTwoX, tab, 0);
                genBlock(heroY, heroX, tab, 2);
                genBlock(chestOneY, chestOneX, tab, 1);
                genBlock(chestTwoY, chestTwoX, tab, 1);
-               genBlock(spotOneY, spotOneX, tab, 0);
-               genBlock(spotTwoY, spotTwoX, tab, 0);
                genMap1(tab);
                action(&heroY, &heroX, &chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY, tab);
           }
