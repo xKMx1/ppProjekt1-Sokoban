@@ -156,7 +156,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
           {
                if (*y == *cy1 + 3 && *x == *cx1) // sprawdzamy czy nie stoi obok nas skrzynia 1
                {
-                    if (tab[*y - 4][*x] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    if ((tab[*y - 4][*x] != 48) && (tab[*y - 4][*x] != 35) && (tab[*y - 4][*x] != 36)) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          *y -= 3;
                          *cy1 -= 3;
@@ -164,7 +164,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
                }
                else if (*y == *cy2 + 3 && *x == *cx2) // sprawdzamy czy nie stoi obok nas skrzynia 2
                {
-                    if (tab[*y - 4][*x] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    if (tab[*y - 4][*x] != 48 && (tab[*y - 4][*x] != 35) && (tab[*y - 4][*x] != 36)) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          *y -= 3;
                          *cy2 -= 3;
@@ -183,7 +183,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
           {
                if (*y == *cy1 - 3 && *x == *cx1) // sprawdzamy czy nie stoi obok nas skrzynia 1
                {
-                    if (tab[*y + 6][*x] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    if (tab[*y + 6][*x] != 48 && tab[*y + 6][*x] != 35 && tab[*y + 6][*x] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          *y += 3;
                          *cy1 += 3;
@@ -191,7 +191,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
                }
                else if (*y == *cy2 - 3 && *x == *cx2) // sprawdzamy czy nie stoi obok nas skrzynia 2
                {
-                    if (tab[*y + 6][*x] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    if (tab[*y + 6][*x] != 48 && tab[*y + 6][*x] != 35 && tab[*y + 6][*x] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          *y += 3;
                          *cy2 += 3;
@@ -211,7 +211,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
 
                if (*y == *cy1 && *x == (*cx1 + 3)) // sprawdzamy czy nie stoi obok nas skrzynia 1
                {
-                    if (tab[*y][*x - 4] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    if (tab[*y][*x - 4] != 48 && tab[*y][*x - 4] != 35 && tab[*y][*x - 4] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          *x -= 3;
                          *cx1 -= 3;
@@ -219,7 +219,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
                }
                else if (*y == *cy2 && *x == (*cx2 + 3)) // sprawdzamy czy nie stoi obok nas skrzynia 2
                {
-                    if (tab[*y][*x - 4] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    if (tab[*y][*x - 4] != 48 && tab[*y][*x - 4] != 35 && tab[*y][*x - 4] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          *x -= 3;
                          *cx2 -= 3;
@@ -238,7 +238,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
           {
                if (*y == *cy1 && *x == (*cx1 - 3)) // sprawdzamy czy nie stoi obok nas skrzynia 1
                {
-                    if (tab[*y][*x + 6] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    if (tab[*y][*x + 6] != 48 && tab[*y][*x + 6] != 35 && tab[*y][*x + 6] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          *x += 3;
                          *cx1 += 3;
@@ -246,7 +246,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
                }
                else if (*y == *cy2 && *x == (*cx2 - 3)) // sprawdzamy czy nie stoi obok nas skrzynia 2
                {
-                    if (tab[*y][*x + 6] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    if (tab[*y][*x + 6] != 48 && tab[*y][*x + 6] != 35 && tab[*y][*x + 6] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          *x += 3;
                          *cx2 += 3;
