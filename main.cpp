@@ -7,8 +7,8 @@
 
 using namespace std;
 
-const int mapX = 80;
-const int mapY = 25;
+const int mapX = 120;
+const int mapY = 35;
 
 void ClearScreen()
 {
@@ -59,7 +59,30 @@ void fillMap1(char tab[mapY][mapX]) // funkcja wypełniająca mapę 1
 {
      fstream file;
 
-     file.open("blank.txt");
+     file.open("level1.txt");
+
+     if (!file)
+     {
+          cout << "Pobranie mapy z pliku się nie powiodło";
+          exit(0);
+     }
+
+     for (int i = 0; i < mapY; i++)
+     {
+          for (int j = 0; j < mapX; j++)
+          {
+               tab[i][j] = file.get();
+          }
+     }
+
+     file.close();
+}
+
+void fillMap2(char tab[mapY][mapX]) // funkcja wypełniająca mapę 2
+{
+     fstream file;
+
+     file.open("level2.txt");
 
      if (!file)
      {
@@ -82,12 +105,13 @@ void genMap(char tab[mapY][mapX]) // wypisujemy na ekran mapę
 {
      ClearScreen();
 
-     for (int i = 0; i < mapY; i++)
+     for (int i = 4; i < 24; i++)
      {
-          for (int j = 0; j < mapX; j++)
+          for (int j = 0; j < 80; j++)
           {
                cout << tab[i][j];
           }
+          cout << "\n";
      }
      cout << "\n";
 }
@@ -124,24 +148,24 @@ int genMenu()
      }
 }
 
-void onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int *chest1, int *chest2)
+void onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2)
 {
      if ((*cx1 == *sx1 && *cy1 == *sy1) || (*cx1 == *sx2 && *cy1 == *sy2)) // Sprawdza czy pierwsza skrzynia znajduje się na pierwszym miejscu docelowym
      {
-          *chest1 = 36;
+          chest1 = 36;
      }
      else
-          *chest1 = 35;
+          chest1 = 35;
 
      if ((*cx2 == *sx1 && *cy2 == *sy1) || (*cx2 == *sx2 && *cy2 == *sy2)) // Sprawdza czy druga skrzynia znajduje się na pierwszym miejscu docelowym
      {
-          *chest2 = 36;
+          chest2 = 36;
      }
      else
-          *chest2 = 35;
+          chest2 = 35;
 }
 
-void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int *chest1, int *chest2, char tab[mapY][mapX])
+void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2, char tab[mapY][mapX])
 {
      cout << "Wprowadz znak: ";
      char znak = getch();
@@ -259,8 +283,10 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
      onSpot(cx1, cy1, cx2, cy2, sx1, sy1, sx2, sy2, chest1, chest2);
 }
 
-void level(int lvl, char tab[mapY][mapX])
+void level(char tab[mapY][mapX])
 {
+     int lvl = 1;
+
      if (lvl == 1)
      {
           int heroX = 24, heroY = 17;
@@ -282,7 +308,41 @@ void level(int lvl, char tab[mapY][mapX])
                genBlock(chestTwoY, chestTwoX, tab, 1, &chest2);
                cout << (steps - i); // wypisujemy na ekran pozostałe kroki
                genMap(tab);
-               action(&heroY, &heroX, &chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY, &chest1, &chest2, tab);
+               action(&heroY, &heroX, &chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY, chest1, chest2, tab);
+               if (chest1 == 36 && chest2 == 36)
+               {
+                    lvl++;
+                    break;
+               }
+          }
+     }
+     if (lvl == 2)
+     {
+          int heroX = 24, heroY = 17;
+          int chestOneX = 39, chestOneY = 8;
+          int chestTwoX = 39, chestTwoY = 11;
+          int spotOneX = 27, spotOneY = 5;
+          int spotTwoX = 30, spotTwoY = 5;
+          int chest1 = 35;
+          int chest2 = 35;
+          int steps = 500;
+
+          for (int i = 1; i < steps + 1; i++)
+          {
+               fillMap2(tab);
+               genBlock(spotOneY, spotOneX, tab, 0, &chest1);
+               genBlock(spotTwoY, spotTwoX, tab, 0, &chest2);
+               genBlock(heroY, heroX, tab, 2, &chest1);
+               genBlock(chestOneY, chestOneX, tab, 1, &chest1);
+               genBlock(chestTwoY, chestTwoX, tab, 1, &chest2);
+               cout << (steps - i); // wypisujemy na ekran pozostałe kroki
+               genMap(tab);
+               action(&heroY, &heroX, &chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY, chest1, chest2, tab);
+               if (chest1 == 36 && chest2 == 36)
+               {
+                    lvl++;
+                    break;
+               }
           }
      }
 }
@@ -295,7 +355,7 @@ int main()
 
      if (genMenu() == 1)
      {
-          level(1, mainMap);
+          level(mainMap);
      }
 
      return 0;
