@@ -126,8 +126,7 @@ int genMenu() {
     }
 }
 
-void
-redo(poziom *poziom) {
+void undo(poziom *poziom) {
     if (undoStack.size() > 1) {
         undoStack.pop();
 
