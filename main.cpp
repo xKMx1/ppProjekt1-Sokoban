@@ -2,12 +2,12 @@
 #include <windows.h>
 #include <conio.h>
 #include <fstream>
-#include <stack>
 
 using namespace std;
 
 const int mapX = 80;
 const int mapY = 25;
+const int replaySize = 100;
 
 struct poziom {
     char mainMap[mapY][mapX];
@@ -23,22 +23,17 @@ struct poziom {
     int spotTwoY;
 };
 
-stack<poziom> undoStack;
-stack<poziom> redoStack;
+poziom undoStack[replaySize];
+poziom redoStack[replaySize];
+
+int undoCounter = 0;
+int redoCounter = 0;
 
 void clearScreen() {
     COORD cursorPosition;
     cursorPosition.X = 0;
     cursorPosition.Y = 0;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
-}
-
-void copyMaps(char changeMap[mapY][mapX], char sourceMap[mapY][mapX]) {
-    for (int i = 0; i < mapY; i++) {
-        for (int j = 0; j < mapX; j++) {
-            changeMap[i][j] = sourceMap[i][j];
-        }
-    }
 }
 
 void startScreen() { // funkcja wyswietlajaca ekran powitalny
@@ -127,28 +122,34 @@ int genMenu() {
 }
 
 void undo(poziom *poziom) {
-    if (undoStack.size() > 1) {
-        undoStack.pop();
+    if (undoCounter > 1 && redoCounter < replaySize - 1) {
+        undoCounter -= 1;
 
-        redoStack.push(*poziom);
+//      redoStack.push(*poziom);
+        redoStack[redoCounter % replaySize] = *poziom;//TODO sprawdzic czy to sie kopiuje
+        redoCounter++;
 
-        *poziom = undoStack.top();
-        undoStack.pop();
+//      *poziom = undoStack.top();
+//      undoStack.pop();
+        *poziom = undoStack[(undoCounter - 1) % replaySize];
+        undoCounter--;
     }
 }
 
 void redo(poziom *poziom) {
     //TODO dodac czyszczenie redoStack po ruchu?
-    if (!redoStack.empty()) {
-        undoStack.pop();
+    if (redoCounter != 0) {
+        undoCounter--;
 
-        undoStack.push(*poziom);
+//        undoStack.push(*poziom);
+        undoStack[(undoCounter-1)%replaySize] = *poziom;
 
-        *poziom = redoStack.top();
-        redoStack.pop();
+//        *poziom = redoStack.top();
+//        redoStack.pop();
+        *poziom = redoStack[redoCounter-1];
+        redoCounter--;
     }
 }
-
 
 void action(int *y, int *x, int *b, int *a, poziom *poziom) {
     cout << "Wprowadz znak: ";
@@ -207,8 +208,12 @@ void action(int *y, int *x, int *b, int *a, poziom *poziom) {
 
 }
 
-void saveGameProgress(poziom poziom) {
-    undoStack.push(poziom);
+void saveGameProgress(poziom *poziom) {
+//    undoStack.push(poziom);
+//    copyGameStates(undoStack[undoCounter], *poziom);
+
+    undoStack[undoCounter % replaySize] = *poziom;
+    undoCounter++;
 }
 
 void level(int lvl, poziom poziom) {
@@ -232,7 +237,7 @@ void level(int lvl, poziom poziom) {
         genBlock(poziom.spotOneY, poziom.spotOneX, &poziom, 0);
         genBlock(poziom.spotTwoY, poziom.spotTwoX, &poziom, 0);
         genMap1(poziom.mainMap);
-        saveGameProgress(poziom);
+        saveGameProgress(&poziom);
         for (int i = 0; i < 500; i++) {
             action(&poziom.heroY, &poziom.heroX, &poziom.chestOneY, &poziom.chestOneX, &poziom);
             fillMap1(&poziom);
@@ -242,7 +247,7 @@ void level(int lvl, poziom poziom) {
             genBlock(poziom.spotOneY, poziom.spotOneX, &poziom, 0);
             genBlock(poziom.spotTwoY, poziom.spotTwoX, &poziom, 0);
             genMap1(poziom.mainMap);
-            saveGameProgress(poziom);
+            saveGameProgress(&poziom);
         }
     }
 }
