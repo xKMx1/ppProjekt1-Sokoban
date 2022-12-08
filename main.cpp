@@ -184,7 +184,7 @@ void action(int *y, int *x, int *b, int *a, poziom *poziom) {
     }
 
     if (znak == 'z' || znak == 'Z') {
-        redo(poziom);
+        undo(poziom);
     }
 
 }
