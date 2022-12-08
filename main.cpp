@@ -124,15 +124,19 @@ int genMenu()
      }
 }
 
-bool onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2)
+bool onSpot(int cx1, int cy1, int cx2, int cy2, int sx1, int sy1, int sx2, int sy2)
 {
-     if ((*cx1 == (*sx1 || *sx2) && *cy1 == (*sy1 || *sy2)) || (*cx2 == (*sx1 || *sx2) && *cy2 == (*sy1 || *sy2)))
+     if ((cx1 == (sx1 || sx2) && cy1 == (sy1 || sy2)) || (cx2 == (sx1 || sx2) && cy2 == (sy1 || sy2)))
      {
-          return 1;
+          return true;
+     }
+     else
+     {
+          return false;
      }
 }
 
-void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2)
+void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, char tab[mapY][mapX])
 {
      cout << "Wprowadz znak: ";
      char znak = getch();
@@ -140,74 +144,116 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2)
 
      if (znak == 119 || znak == 87) // instrukcje dla "W"
      {
-          if (*y == *cx1 + 3 && *x == *cy1)
+          if (tab[*y - 1][*x] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
           {
-               *y -= 3;
-               *cx1 -= 3;
-          }
-          else if (*y == *cx2 + 3 && *x == *cy2)
-          {
-               *y -= 3;
-               *cx2 -= 3;
-          }
-          else
-          {
-               *y -= 3;
+               if (*y == *cy1 + 3 && *x == *cx1) // sprawdzamy czy nie stoi obok nas skrzynia 1
+               {
+                    if (tab[*y - 4][*x] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    {
+                         *y -= 3;
+                         *cy1 -= 3;
+                    }
+               }
+               else if (*y == *cy2 + 3 && *x == *cx2) // sprawdzamy czy nie stoi obok nas skrzynia 2
+               {
+                    if (tab[*y - 4][*x] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    {
+                         *y -= 3;
+                         *cy2 -= 3;
+                    }
+               }
+               else
+               {
+                    *y -= 3;
+               }
           }
      }
 
      if (znak == 115 || znak == 83) // instrukcje dla "S"
      {
-          if (*y == *cx1 - 3 && *x == *cy1)
+          if (tab[*y + 3][*x] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
           {
-               *y += 3;
-               *cx1 += 3;
-          }
-          else if (*y == *cx2 - 3 && *x == *cy2)
-          {
-               *y += 3;
-               *cx2 += 3;
-          }
-          else
-          {
-               *y += 3;
+               if (*y == *cy1 - 3 && *x == *cx1) // sprawdzamy czy nie stoi obok nas skrzynia 1
+               {
+                    if (tab[*y + 6][*x] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    {
+                         *y += 3;
+                         *cy1 += 3;
+                    }
+               }
+               else if (*y == *cy2 - 3 && *x == *cx2) // sprawdzamy czy nie stoi obok nas skrzynia 2
+               {
+                    if (tab[*y + 6][*x] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    {
+                         *y += 3;
+                         *cy2 += 3;
+                    }
+               }
+               else
+               {
+                    *y += 3;
+               }
           }
      }
 
      if (znak == 97 || znak == 65) // instrukcje dla "A"
      {
-          if (*y == *cx1 && *x == (*cy1 + 3))
+          if (tab[*y][*x - 1] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
           {
-               *x -= 3;
-               *cy1 -= 3;
-          }
-          else if (*y == *cx2 && *x == (*cy2 + 3))
-          {
-               *x -= 3;
-               *cy2 -= 3;
-          }
-          else
-          {
-               *x -= 3;
+
+               if (*y == *cy1 && *x == (*cx1 + 3)) // sprawdzamy czy nie stoi obok nas skrzynia 1
+               {
+                    if (tab[*y][*x - 4] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    {
+                         *x -= 3;
+                         *cx1 -= 3;
+                    }
+               }
+               else if (*y == *cy2 && *x == (*cx2 + 3)) // sprawdzamy czy nie stoi obok nas skrzynia 2
+               {
+                    if (tab[*y][*x - 4] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    {
+                         *x -= 3;
+                         *cx2 -= 3;
+                    }
+               }
+               else
+               {
+                    *x -= 3;
+               }
           }
      }
 
      if (znak == 100 || znak == 68) // instrukcje dla "D"
      {
-          if (*y == *cx1 && *x == (*cy1 - 3))
+          if (tab[*y][*x + 3] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
           {
-               *x += 3;
-               *cy1 += 3;
+               if (*y == *cy1 && *x == (*cx1 - 3)) // sprawdzamy czy nie stoi obok nas skrzynia 1
+               {
+                    if (tab[*y][*x + 6] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    {
+                         *x += 3;
+                         *cx1 += 3;
+                    }
+               }
+               else if (*y == *cy2 && *x == (*cx2 - 3)) // sprawdzamy czy nie stoi obok nas skrzynia 2
+               {
+                    if (tab[*y][*x + 6] != 48) // sprawdzamy czy nie wpychamy skrzymi w ścienę
+                    {
+                         *x += 3;
+                         *cx2 += 3;
+                    }
+               }
+               else
+               {
+                    *x += 3;
+               }
           }
-          else if (*y == *cx2 && *x == (*cy2 - 3))
-          {
-               *x += 3;
-               *cy2 += 3;
-          }
-          else
-          {
-               *x += 3;
-          }
+     }
+
+     if (onSpot(*cx1, *cy1, *cx2, *cy2, *sx1, *sy1, *sx2, *sy2))
+     {
+          tab[0][0] = 65;
      }
 }
 
@@ -231,13 +277,7 @@ void level(int lvl, char tab[mapY][mapX])
                genBlock(spotOneY, spotOneX, tab, 0);
                genBlock(spotTwoY, spotTwoX, tab, 0);
                genMap1(tab);
-               action(&heroY, &heroX, &chestOneY, &chestOneX, &chestTwoY, &chestTwoX);
-               if (onSpot(&chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY))
-               {
-                    tab[24][79] = 45;
-               }
-               genMap1(tab);
-               Sleep(1000);
+               action(&heroY, &heroX, &chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY, tab);
           }
      }
 }
