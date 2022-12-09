@@ -27,6 +27,7 @@ struct level
      int stepsUsed;
      int camX;
      int camY;
+     char fileName[11];
 };
 
 const int mapX = 120;
@@ -77,34 +78,11 @@ void genBlock(int y, int x, char tab[mapY][mapX], int var, int *chest)
      }
 }
 
-void fillMap1(char tab[mapY][mapX]) // funkcja wypełniająca mapę 1
+void fillMap(char tab[mapY][mapX], char path[11]) // funkcja wypełniająca mapę 1
 {
      fstream file;
 
-     file.open("level1.txt");
-
-     if (!file)
-     {
-          cout << "Pobranie mapy z pliku się nie powiodło";
-          exit(0);
-     }
-
-     for (int i = 0; i < mapY; i++)
-     {
-          for (int j = 0; j < mapX; j++)
-          {
-               tab[i][j] = file.get();
-          }
-     }
-
-     file.close();
-}
-
-void fillMap2(char tab[mapY][mapX]) // funkcja wypełniająca mapę 2
-{
-     fstream file;
-
-     file.open("level2.txt");
+     file.open(path);
 
      if (!file)
      {
@@ -337,7 +315,7 @@ void genLevel(char tab[mapY][mapX], level lvl)
 {
      while (1)
      {
-          fillMap1(tab);
+          fillMap(tab, lvl.fileName);
           genBlock(lvl.spotOneY, lvl.spotOneX, tab, 0, &lvl.chest1);
           genBlock(lvl.spotTwoY, lvl.spotTwoX, tab, 0, &lvl.chest2);
           genBlock(lvl.heroY, lvl.heroX, tab, 2, &lvl.chest1);
@@ -435,6 +413,7 @@ int main()
      lvlOne.stepsUsed = 0;
      lvlOne.camX = 0;
      lvlOne.camY = 0;
+     strcpy(lvlOne.fileName, "level1.txt");
 
      lvlTwo.heroY = 13;
      lvlTwo.heroX = 23;
@@ -454,6 +433,7 @@ int main()
      lvlTwo.stepsUsed = 0;
      lvlTwo.camX = 0;
      lvlTwo.camY = 0;
+     strcpy(lvlTwo.fileName, "level2.txt");
 
      // startScreen();
 
