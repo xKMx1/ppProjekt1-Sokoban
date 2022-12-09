@@ -171,7 +171,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
      char znak = getch();
      cout << znak;
 
-     if (znak == 119 || znak == 87) // instrukcje dla "W" RUCH GÓRA
+     if (znak == 119 || znak == 87) // instrukcje dla "W" i "w" RUCH GÓRA
      {
           if (tab[*y - 1][*x] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
           {
@@ -198,7 +198,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
           }
      }
 
-     if (znak == 115 || znak == 83) // instrukcje dla "S" RUCH DÓŁ
+     if (znak == 115 || znak == 83) // instrukcje dla "S" i "s" RUCH DÓŁ
      {
           if (tab[*y + 3][*x] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
           {
@@ -225,7 +225,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
           }
      }
 
-     if (znak == 97 || znak == 65) // instrukcje dla "A" RUCH LEWO
+     if (znak == 97 || znak == 65) // instrukcje dla "A" i "a" RUCH LEWO
      {
           if (tab[*y][*x - 1] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
           {
@@ -253,7 +253,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
           }
      }
 
-     if (znak == 100 || znak == 68) // instrukcje dla "D" RUCH PRAWO
+     if (znak == 100 || znak == 68) // instrukcje dla "D" i "d" RUCH PRAWO
      {
           if (tab[*y][*x + 3] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
           {
@@ -280,7 +280,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
           }
      }
 
-     if (znak == 106 || znak == 74) // isntrukcja dla "J" KAMERA LEWO
+     if (znak == 106 || znak == 74) // isntrukcja dla "J" i "j" KAMERA LEWO
      {
           if (*cameraX != 0) // ogranicza wyjście kamery za mapę
           {
@@ -288,7 +288,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
           }
      }
 
-     if (znak == 107 || znak == 75) // isntrukcja dla "K" KAMERA PRAWO
+     if (znak == 107 || znak == 75) // isntrukcja dla "K" i "k" KAMERA PRAWO
      {
           if (*cameraX != 39) // ogranicza wyjście kamery za mapę
           {
@@ -296,7 +296,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
           }
      }
 
-     if (znak == 105 || znak == 73) // isntrukcja dla "I" KAMERA GÓRA
+     if (znak == 105 || znak == 73) // isntrukcja dla "I" i "i" KAMERA GÓRA
      {
           if (*cameraY != 0) // ogranicza wyjście kamery za mapę
           {
@@ -304,7 +304,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
           }
      }
 
-     if (znak == 109 || znak == 77) // isntrukcja dla "M" KAMERA DÓŁ
+     if (znak == 109 || znak == 77) // isntrukcja dla "M" i "m" KAMERA DÓŁ
      {
           if (*cameraY != 10) // ogranicza wyjście kamery za mapę
           {
@@ -313,6 +313,21 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
      }
 
      onSpot(cx1, cy1, cx2, cy2, sx1, sy1, sx2, sy2, chest1, chest2);
+}
+
+void schowSteps(int x, int i) // Wyświetlanie liczby kroków i logika związana z krokami
+{
+     int sum;
+     sum = x - i;
+     cout << "Pozostale kroki: " << sum << " "
+          << "\n";
+
+     if (sum == 0)
+     {
+          system("CLS");
+          cout << "DUPA";
+          Sleep(1000);
+     }
 }
 
 void level(char tab[mapY][mapX])
@@ -328,7 +343,7 @@ void level(char tab[mapY][mapX])
           int spotTwoX = 30, spotTwoY = 5;
           int chest1 = 35;
           int chest2 = 35;
-          int steps = 500;
+          int steps = 25;
           int camX = 0, camY = 0;
 
           for (int i = 1; i < steps + 1; i++)
@@ -339,9 +354,10 @@ void level(char tab[mapY][mapX])
                genBlock(heroY, heroX, tab, 2, &chest1);
                genBlock(chestOneY, chestOneX, tab, 1, &chest1);
                genBlock(chestTwoY, chestTwoX, tab, 1, &chest2);
-               // cout << (steps - i); // wypisujemy na ekran pozostałe kroki
                genMap(tab, &camX, &camY);
+               schowSteps(steps, i);
                action(&heroY, &heroX, &chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY, chest1, chest2, &camX, &camY, tab);
+
                if (chest1 == 36 && chest2 == 36)
                {
                     lvl++;
@@ -369,9 +385,10 @@ void level(char tab[mapY][mapX])
                genBlock(heroY, heroX, tab, 2, &chest1);
                genBlock(chestOneY, chestOneX, tab, 1, &chest1);
                genBlock(chestTwoY, chestTwoX, tab, 1, &chest2);
-               // cout << (steps - i); // wypisujemy na ekran pozostałe kroki
                genMap(tab, &camX, &camY);
                action(&heroY, &heroX, &chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY, chest1, chest2, &camX, &camY, tab);
+               schowSteps(steps, i);
+
                if (chest1 == 36 && chest2 == 36)
                {
                     lvl++;
