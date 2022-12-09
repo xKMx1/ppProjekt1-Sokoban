@@ -7,6 +7,28 @@
 
 using namespace std;
 
+struct level
+{
+     int heroX;
+     int heroY;
+     int tempX;
+     int tempY;
+     int chestOneX;
+     int chestOneY;
+     int chestTwoX;
+     int chestTwoY;
+     int spotOneX;
+     int spotOneY;
+     int spotTwoX;
+     int spotTwoY;
+     int chest1;
+     int chest2;
+     int steps;
+     int stepsUsed;
+     int camX;
+     int camY;
+};
+
 const int mapX = 120;
 const int mapY = 35;
 
@@ -114,62 +136,6 @@ void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY) // wypisujemy na e
           cout << "\n";
      }
      cout << "\n";
-}
-
-int genMenu()
-{
-     system("cls");
-     cout << "Wybierz:"
-          << "\n";
-     cout << "(1) Wybierz poziom"
-          << "\n";
-     cout << "(2) Opusc gre"
-          << "\n";
-
-     while (1)
-     {
-          char znak = getchar();
-
-          if (znak == 49)
-          {
-               system("CLS");
-               cout << "Wybierz: "
-                    << "\n"
-                    << "(1) Poziom 1"
-                    << "\n"
-                    << "(2) Poziom 2"
-                    << "\n"
-                    << "(3) Poziom 3"
-                    << "\n";
-
-               znak = getchar();
-               cout << znak;
-               Sleep(1000);
-               if (znak == 49)
-               {
-                    return 1;
-               }
-               if (znak == 50)
-               {
-                    return 2;
-               }
-               if (znak == 51)
-               {
-                    return 3;
-               }
-          }
-          else if (znak == 50)
-          {
-               exit(0);
-          }
-          else
-          {
-               cout << "Wybrales niepoprawny znak! Mozesz wybrac 1 lub 2."
-                    << "\n";
-               Sleep(1000);
-               genMenu();
-          }
-     }
 }
 
 void onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2)
@@ -338,7 +304,7 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
 
      if (znak == 113 || znak == 81) // instrukcja dla "Q" i "q" MENU
      {
-          genMenu();
+          cout << "Do naprawienia";
      }
 
      onSpot(cx1, cy1, cx2, cy2, sx1, sy1, sx2, sy2, chest1, chest2);
@@ -367,72 +333,78 @@ void schowSteps(int *heroX, int *heroY, int *tempX, int *tempY, int steps, int *
      }
 }
 
-void level(char tab[mapY][mapX])
+void genLevel(char tab[mapY][mapX], level lvl)
 {
-     int lvl = 1;
-
-     if (lvl == 1)
+     while (1)
      {
-          int heroX = 24, heroY = 17;
-          int tempX = 24, tempY = 17;
-          int chestOneX = 39, chestOneY = 8;
-          int chestTwoX = 39, chestTwoY = 11;
-          int spotOneX = 27, spotOneY = 5;
-          int spotTwoX = 30, spotTwoY = 5;
-          int chest1 = 35;
-          int chest2 = 35;
-          int steps = 25, stepsUsed = 0;
-          int camX = 0, camY = 0;
+          fillMap1(tab);
+          genBlock(lvl.spotOneY, lvl.spotOneX, tab, 0, &lvl.chest1);
+          genBlock(lvl.spotTwoY, lvl.spotTwoX, tab, 0, &lvl.chest2);
+          genBlock(lvl.heroY, lvl.heroX, tab, 2, &lvl.chest1);
+          genBlock(lvl.chestOneY, lvl.chestOneX, tab, 1, &lvl.chest1);
+          genBlock(lvl.chestTwoY, lvl.chestTwoX, tab, 1, &lvl.chest2);
+          genMap(tab, &lvl.camX, &lvl.camY);
+          schowSteps(&lvl.heroX, &lvl.heroY, &lvl.tempX, &lvl.tempY, lvl.steps, &lvl.stepsUsed);
+          action(&lvl.heroY, &lvl.heroX, &lvl.chestOneX, &lvl.chestOneY, &lvl.chestTwoX, &lvl.chestTwoY, &lvl.spotOneX, &lvl.spotOneY, &lvl.spotTwoX, &lvl.spotTwoY, lvl.chest1, lvl.chest2, &lvl.camX, &lvl.camY, tab);
 
-          while (1)
+          if (lvl.chest1 == 36 && lvl.chest2 == 36)
           {
-               fillMap1(tab);
-               genBlock(spotOneY, spotOneX, tab, 0, &chest1);
-               genBlock(spotTwoY, spotTwoX, tab, 0, &chest2);
-               genBlock(heroY, heroX, tab, 2, &chest1);
-               genBlock(chestOneY, chestOneX, tab, 1, &chest1);
-               genBlock(chestTwoY, chestTwoX, tab, 1, &chest2);
-               genMap(tab, &camX, &camY);
-               schowSteps(&heroX, &heroY, &tempX, &tempY, steps, &stepsUsed);
-               action(&heroY, &heroX, &chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY, chest1, chest2, &camX, &camY, tab);
-
-               if (chest1 == 36 && chest2 == 36)
-               {
-                    lvl++;
-                    break;
-               }
+               break;
           }
      }
-     if (lvl == 2)
+}
+
+int genMenu(char tab[mapY][mapX], level lvl1, level lvl2, level lvl3)
+{
+     system("cls");
+     cout << "Wybierz:"
+          << "\n";
+     cout << "(1) Wybierz poziom"
+          << "\n";
+     cout << "(2) Opusc gre"
+          << "\n";
+
+     while (1)
      {
-          int heroX = 23, heroY = 13;
-          int tempX = 23, tempY = 13;
-          int chestOneX = 68, chestOneY = 7;
-          int chestTwoX = 80, chestTwoY = 19;
-          int spotOneX = 8, spotOneY = 4;
-          int spotTwoX = 26, spotTwoY = 4;
-          int chest1 = 35;
-          int chest2 = 35;
-          int steps = 500, stepsUsed = 0;
-          int camX = 0, camY = 0;
+          char znak;
+          cin >> znak;
 
-          for (int i = 1; i < steps + 1; i++)
+          if (znak == 49)
           {
-               fillMap2(tab);
-               genBlock(spotOneY, spotOneX, tab, 0, &chest1);
-               genBlock(spotTwoY, spotTwoX, tab, 0, &chest2);
-               genBlock(heroY, heroX, tab, 2, &chest1);
-               genBlock(chestOneY, chestOneX, tab, 1, &chest1);
-               genBlock(chestTwoY, chestTwoX, tab, 1, &chest2);
-               genMap(tab, &camX, &camY);
-               schowSteps(&heroX, &heroY, &tempX, &tempY, steps, &stepsUsed);
-               action(&heroY, &heroX, &chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY, chest1, chest2, &camX, &camY, tab);
+               system("CLS");
+               cout << "Wybierz: "
+                    << "\n"
+                    << "(1) Poziom 1"
+                    << "\n"
+                    << "(2) Poziom 2"
+                    << "\n"
+                    << "(3) Poziom 3"
+                    << "\n";
 
-               if (chest1 == 36 && chest2 == 36)
+               cin >> znak;
+               if (znak == 49)
                {
-                    lvl++;
-                    break;
+                    genLevel(tab, lvl1);
                }
+               if (znak == 50)
+               {
+                    genLevel(tab, lvl2);
+               }
+               if (znak == 51)
+               {
+                    genLevel(tab, lvl3);
+               }
+          }
+          else if (znak == 50)
+          {
+               exit(0);
+          }
+          else
+          {
+               cout << "Wybrales niepoprawny znak! Mozesz wybrac 1 lub 2."
+                    << "\n";
+               Sleep(1000);
+               genMenu(tab, lvl1, lvl2, lvl3);
           }
      }
 }
@@ -441,12 +413,51 @@ int main()
 {
      char mainMap[mapY][mapX];
 
+     level lvlOne;
+     level lvlTwo;
+     level lvlThree;
+
+     lvlOne.heroX = 24;
+     lvlOne.heroY = 17;
+     lvlOne.tempX = 24;
+     lvlOne.tempY = 17;
+     lvlOne.chestOneX = 39;
+     lvlOne.chestOneY = 8;
+     lvlOne.chestTwoX = 39;
+     lvlOne.chestTwoY = 11;
+     lvlOne.spotOneX = 27;
+     lvlOne.spotOneY = 5;
+     lvlOne.spotTwoX = 30;
+     lvlOne.spotTwoY = 5;
+     lvlOne.chest1 = 35;
+     lvlOne.chest2 = 35;
+     lvlOne.steps = 25;
+     lvlOne.stepsUsed = 0;
+     lvlOne.camX = 0;
+     lvlOne.camY = 0;
+
+     lvlTwo.heroY = 13;
+     lvlTwo.heroX = 23;
+     lvlTwo.tempX = 23;
+     lvlTwo.tempY = 13;
+     lvlTwo.chestOneX = 68;
+     lvlTwo.chestOneY = 7;
+     lvlTwo.chestTwoX = 80;
+     lvlTwo.chestTwoY = 19;
+     lvlTwo.spotOneX = 8;
+     lvlTwo.spotOneY = 4;
+     lvlTwo.spotTwoX = 26;
+     lvlTwo.spotTwoY = 4;
+     lvlTwo.chest1 = 35;
+     lvlTwo.chest2 = 35;
+     lvlTwo.steps = 60;
+     lvlTwo.stepsUsed = 0;
+     lvlTwo.camX = 0;
+     lvlTwo.camY = 0;
+
      // startScreen();
 
-     if (genMenu() == 1)
-     {
-          level(mainMap);
-     }
+     genMenu(mainMap, lvlOne, lvlTwo, lvlThree);
 
      return 0;
 }
