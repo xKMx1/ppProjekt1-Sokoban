@@ -121,7 +121,7 @@ int genMenu()
      system("cls");
      cout << "Wybierz:"
           << "\n";
-     cout << "(1) Rozpocznij gre od pierwszego etapu"
+     cout << "(1) Wybierz poziom"
           << "\n";
      cout << "(2) Opusc gre"
           << "\n";
@@ -132,7 +132,31 @@ int genMenu()
 
           if (znak == 49)
           {
-               return 1;
+               system("CLS");
+               cout << "Wybierz: "
+                    << "\n"
+                    << "(1) Poziom 1"
+                    << "\n"
+                    << "(2) Poziom 2"
+                    << "\n"
+                    << "(3) Poziom 3"
+                    << "\n";
+
+               znak = getchar();
+               cout << znak;
+               Sleep(1000);
+               if (znak == 49)
+               {
+                    return 1;
+               }
+               if (znak == 50)
+               {
+                    return 2;
+               }
+               if (znak == 51)
+               {
+                    return 3;
+               }
           }
           else if (znak == 50)
           {
@@ -280,53 +304,66 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
           }
      }
 
-     if (znak == 106 || znak == 74) // isntrukcja dla "J" i "j" KAMERA LEWO
+     if (znak == 106 || znak == 74) // instrukcja dla "J" i "j" KAMERA LEWO
      {
           if (*cameraX != 0) // ogranicza wyjście kamery za mapę
           {
-               *cameraX = *cameraX - 1;
+               (*cameraX)--;
           }
      }
 
-     if (znak == 107 || znak == 75) // isntrukcja dla "K" i "k" KAMERA PRAWO
+     if (znak == 107 || znak == 75) // instrukcja dla "K" i "k" KAMERA PRAWO
      {
           if (*cameraX != 39) // ogranicza wyjście kamery za mapę
           {
-               *cameraX = *cameraX + 1;
+               (*cameraX)++;
           }
      }
 
-     if (znak == 105 || znak == 73) // isntrukcja dla "I" i "i" KAMERA GÓRA
+     if (znak == 105 || znak == 73) // instrukcja dla "I" i "i" KAMERA GÓRA
      {
           if (*cameraY != 0) // ogranicza wyjście kamery za mapę
           {
-               *cameraY = *cameraY - 1;
+               (*cameraY)--;
           }
      }
 
-     if (znak == 109 || znak == 77) // isntrukcja dla "M" i "m" KAMERA DÓŁ
+     if (znak == 109 || znak == 77) // instrukcja dla "M" i "m" KAMERA DÓŁ
      {
           if (*cameraY != 10) // ogranicza wyjście kamery za mapę
           {
-               *cameraY = *cameraY + 1;
+               (*cameraY)++;
           }
+     }
+
+     if (znak == 113 || znak == 81) // instrukcja dla "Q" i "q" MENU
+     {
+          genMenu();
      }
 
      onSpot(cx1, cy1, cx2, cy2, sx1, sy1, sx2, sy2, chest1, chest2);
 }
 
-void schowSteps(int x, int i) // Wyświetlanie liczby kroków i logika związana z krokami
+void schowSteps(int *heroX, int *heroY, int *tempX, int *tempY, int steps, int *stepsUsed) // Wyświetlanie liczby kroków i logika związana z krokami
 {
-     int sum;
-     sum = x - i;
-     cout << "Pozostale kroki: " << sum << " "
-          << "\n";
+     int stepsLeft;
 
-     if (sum == 0)
+     if (*heroX != *tempX || *heroY != *tempY)
+     {
+          *tempX == *heroX;
+          *tempY == *heroY;
+          (*stepsUsed)++;
+     }
+     stepsLeft = steps - *stepsUsed;
+     cout << "Pozostalo krokow: " << stepsLeft << " \n";
+
+     if (stepsLeft == 0)
      {
           system("CLS");
-          cout << "DUPA";
-          Sleep(1000);
+          cout << "PRZEGRANA"
+               << "\n"
+               << "BRAK RUCHOW";
+          getchar();
      }
 }
 
@@ -337,16 +374,17 @@ void level(char tab[mapY][mapX])
      if (lvl == 1)
      {
           int heroX = 24, heroY = 17;
+          int tempX = 24, tempY = 17;
           int chestOneX = 39, chestOneY = 8;
           int chestTwoX = 39, chestTwoY = 11;
           int spotOneX = 27, spotOneY = 5;
           int spotTwoX = 30, spotTwoY = 5;
           int chest1 = 35;
           int chest2 = 35;
-          int steps = 25;
+          int steps = 25, stepsUsed = 0;
           int camX = 0, camY = 0;
 
-          for (int i = 1; i < steps + 1; i++)
+          while (1)
           {
                fillMap1(tab);
                genBlock(spotOneY, spotOneX, tab, 0, &chest1);
@@ -355,7 +393,7 @@ void level(char tab[mapY][mapX])
                genBlock(chestOneY, chestOneX, tab, 1, &chest1);
                genBlock(chestTwoY, chestTwoX, tab, 1, &chest2);
                genMap(tab, &camX, &camY);
-               schowSteps(steps, i);
+               schowSteps(&heroX, &heroY, &tempX, &tempY, steps, &stepsUsed);
                action(&heroY, &heroX, &chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY, chest1, chest2, &camX, &camY, tab);
 
                if (chest1 == 36 && chest2 == 36)
@@ -368,13 +406,14 @@ void level(char tab[mapY][mapX])
      if (lvl == 2)
      {
           int heroX = 23, heroY = 13;
+          int tempX = 23, tempY = 13;
           int chestOneX = 68, chestOneY = 7;
           int chestTwoX = 80, chestTwoY = 19;
           int spotOneX = 8, spotOneY = 4;
           int spotTwoX = 26, spotTwoY = 4;
           int chest1 = 35;
           int chest2 = 35;
-          int steps = 500;
+          int steps = 500, stepsUsed = 0;
           int camX = 0, camY = 0;
 
           for (int i = 1; i < steps + 1; i++)
@@ -386,8 +425,8 @@ void level(char tab[mapY][mapX])
                genBlock(chestOneY, chestOneX, tab, 1, &chest1);
                genBlock(chestTwoY, chestTwoX, tab, 1, &chest2);
                genMap(tab, &camX, &camY);
+               schowSteps(&heroX, &heroY, &tempX, &tempY, steps, &stepsUsed);
                action(&heroY, &heroX, &chestOneX, &chestOneY, &chestTwoX, &chestTwoY, &spotOneX, &spotOneY, &spotTwoX, &spotTwoY, chest1, chest2, &camX, &camY, tab);
-               schowSteps(steps, i);
 
                if (chest1 == 36 && chest2 == 36)
                {
