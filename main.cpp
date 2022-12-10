@@ -37,13 +37,14 @@ const int mapY = 35;
 const int tabX = 10;
 const int tabY = 2;
 
-void ClearScreen()
+void clearScreen()
 {
      COORD cursorPosition;
      cursorPosition.X = 0;
      cursorPosition.Y = 0;
      SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
 }
+
 void startScreen();
 void endScreen();
 void winScreen();
@@ -246,7 +247,7 @@ void fillMap(char tab[mapY][mapX], char path[11]) // funkcja wypełniająca map�
 
 void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY) // funkcja wypisujaca na ekran mapę
 {
-     ClearScreen();
+     clearScreen();
 
      for (int i = *cameraY; i < *cameraY + 25; i++)
      {
