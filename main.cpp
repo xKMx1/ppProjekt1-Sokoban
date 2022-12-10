@@ -1,14 +1,15 @@
 #include <iostream>
 #include <iomanip>
-#include <stdlib.h>
 #include <windows.h>
 #include <conio.h>
 #include <fstream>
+#include <algorithm>
 
 using namespace std;
 
 struct level
 {
+     int lvlId;
      int heroX;
      int heroY;
      int tempX;
@@ -27,6 +28,7 @@ struct level
      int stepsUsed;
      int camX;
      int camY;
+     bool locked;
      char fileName[11];
 };
 
@@ -40,9 +42,103 @@ void ClearScreen()
      cursorPosition.Y = 0;
      SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
 }
+void startScreen();
+void endScreen();
+void winScreen();
+void winCheck(int *chestPicto1, int *chestPicto2, level lvl1, level lvl2, level lvl3);
+void fillTable(int tab[10][2]);
+void genBlock(int y, int x, char tab[mapY][mapX], int var, int *chest);
+void fillMap(char tab[mapY][mapX], char path[11]);
+void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY);
+void onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2);
+void schowSteps(int *heroX, int *heroY, int *tempX, int *tempY, int steps, int *stepsUsed);
+void genLevel(char tab[mapY][mapX], level lvl, level lvl1, level lvl2, level lvl3);
+void genMenu(char tab[mapY][mapX], level lvl1, level lvl2, level lvl3);
+void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2, int *cameraX, int *cameraY, level lvl1, level lvl2, level lvl3, int pastMoves[10][2], int *counter, char tab[mapY][mapX]);
 
-void startScreen()
-{ // funkcja wyswietlajaca ekran powitalny
+int main()
+{
+     char mainMap[mapY][mapX];
+
+     level lvlOne;
+     level lvlTwo;
+     level lvlThree;
+
+     lvlOne.lvlId = 1; // Definicja wartości dla pierwszego poziomu
+     lvlOne.heroX = 24;
+     lvlOne.heroY = 17;
+     lvlOne.tempX = 24;
+     lvlOne.tempY = 17;
+     lvlOne.chestOneX = 39;
+     lvlOne.chestOneY = 8;
+     lvlOne.chestTwoX = 39;
+     lvlOne.chestTwoY = 11;
+     lvlOne.spotOneX = 27;
+     lvlOne.spotOneY = 5;
+     lvlOne.spotTwoX = 30;
+     lvlOne.spotTwoY = 5;
+     lvlOne.chest1 = 35;
+     lvlOne.chest2 = 35;
+     lvlOne.steps = 50;
+     lvlOne.stepsUsed = 0;
+     lvlOne.camX = 0;
+     lvlOne.camY = 0;
+     lvlOne.locked = false;
+     strcpy(lvlOne.fileName, "level1.txt");
+
+     lvlTwo.lvlId = 2; // Definicja wartości dla drugiego poziomu
+     lvlTwo.heroY = 13;
+     lvlTwo.heroX = 23;
+     lvlTwo.tempX = 23;
+     lvlTwo.tempY = 13;
+     lvlTwo.chestOneX = 68;
+     lvlTwo.chestOneY = 7;
+     lvlTwo.chestTwoX = 80;
+     lvlTwo.chestTwoY = 19;
+     lvlTwo.spotOneX = 8;
+     lvlTwo.spotOneY = 4;
+     lvlTwo.spotTwoX = 26;
+     lvlTwo.spotTwoY = 4;
+     lvlTwo.chest1 = 35;
+     lvlTwo.chest2 = 35;
+     lvlTwo.steps = 160;
+     lvlTwo.stepsUsed = 0;
+     lvlTwo.camX = 0;
+     lvlTwo.camY = 0;
+     lvlTwo.locked = true;
+     strcpy(lvlTwo.fileName, "level2.txt");
+
+     lvlThree.lvlId = 3; // Definicja wartości dla trzeciego poziomu
+     lvlThree.heroY = 21;
+     lvlThree.heroX = 23;
+     lvlThree.tempX = 23;
+     lvlThree.tempY = 23;
+     lvlThree.chestOneX = 35;
+     lvlThree.chestOneY = 24;
+     lvlThree.chestTwoX = 92;
+     lvlThree.chestTwoY = 21;
+     lvlThree.spotOneX = 89;
+     lvlThree.spotOneY = 3;
+     lvlThree.spotTwoX = 89;
+     lvlThree.spotTwoY = 6;
+     lvlThree.chest1 = 35;
+     lvlThree.chest2 = 35;
+     lvlThree.steps = 400;
+     lvlThree.stepsUsed = 0;
+     lvlThree.camX = 0;
+     lvlThree.camY = 0;
+     lvlThree.locked = true;
+     strcpy(lvlThree.fileName, "level3.txt");
+
+     // startScreen();
+
+     genMenu(mainMap, lvlOne, lvlTwo, lvlThree);
+
+     return 0;
+}
+
+void startScreen() // funkcja wyswietlajaca ekran powitalny
+{
      system("CLS");
 
      cout << "  /$$$$$$            /$$                 /$$                          " << endl;
@@ -54,12 +150,54 @@ void startScreen()
      cout << "|  $$$$$$/|  $$$$$$/| $$ " << char(92) << "  $$|  $$$$$$/| $$$$$$$/|  $$$$$$$| $$  | $$" << endl;
      cout << " " << char(92) << "______/  " << char(92) << "______/ |__/  " << char(92) << "__/ " << char(92) << "______/ |_______/  " << char(92) << "_______/|__/  |__/" << endl
           << endl;
-     cout << "                        Kamil Ratajczyk s193345                                                                             ";
-
-     Sleep(3000);
+     cout << "                        Kamil Ratajczyk s193345" << endl
+          << endl;
+     cout << "                   Wyslij dowolny znak aby rozpoczac" << endl;
+     getchar();
 }
 
-void genBlock(int y, int x, char tab[mapY][mapX], int var, int *chest)
+void endScreen() // funkcja wyswietlajaca ekran przegranej
+{
+     char a;
+     system("CLS");
+     cout << "PRZEGRALES!" << endl;
+     cout << "BRAK KROKOW" << endl;
+     cin >> a;
+     exit(1);
+}
+
+void winScreen() // funkcja wyswietlajaca ekran wygranej
+{
+     char a;
+     system("CLS");
+     cout << "WYGRALES!" << endl;
+     cout << "GRATULACJE" << endl;
+     cin >> a;
+     exit(1);
+}
+
+void winCheck(char tab[mapY][mapX], int *chestPicto1, int *chestPicto2, level lvl, level lvl1, level lvl2, level lvl3)
+{
+     if (lvl.chest1 == 36 && lvl.chest2 == 36)
+     {
+          if (lvl.lvlId == lvl1.lvlId)
+          {
+               lvl2.locked = false;
+               genMenu(tab, lvl1, lvl2, lvl3);
+          }
+          if (lvl.lvlId == lvl2.lvlId)
+          {
+               lvl3.locked = false;
+               genMenu(tab, lvl1, lvl2, lvl3);
+          }
+          if (lvl.lvlId == lvl3.lvlId)
+          {
+               winScreen();
+          }
+     }
+}
+
+void genBlock(int y, int x, char tab[mapY][mapX], int var, int *chest) // funkcja generująca blok w podanym miejscu
 {
      for (int i = 0; i < 3; i++) // generujemy blok 3x3 razem z koleinym forem
      {
@@ -81,7 +219,7 @@ void genBlock(int y, int x, char tab[mapY][mapX], int var, int *chest)
      }
 }
 
-void fillMap(char tab[mapY][mapX], char path[11]) // funkcja wypełniająca mapę 1
+void fillMap(char tab[mapY][mapX], char path[11]) // funkcja wypełniająca mapę danymi z podnaego pliku
 {
      fstream file;
 
@@ -104,7 +242,7 @@ void fillMap(char tab[mapY][mapX], char path[11]) // funkcja wypełniająca map�
      file.close();
 }
 
-void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY) // wypisujemy na ekran mapę
+void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY) // funkcja wypisujaca na ekran mapę
 {
      ClearScreen();
 
@@ -119,16 +257,16 @@ void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY) // wypisujemy na e
      cout << "\n";
 }
 
-void onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2)
+void onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2) // funkcja sprawdzająca położenie skrzyń
 {
-     if ((*cx1 == *sx1 && *cy1 == *sy1) || (*cx1 == *sx2 && *cy1 == *sy2)) // Sprawdza czy pierwsza skrzynia znajduje się na pierwszym miejscu docelowym
-     {
+     if ((*cx1 == *sx1 && *cy1 == *sy1) || (*cx1 == *sx2 && *cy1 == *sy2)) // Sprawdza czy pierwsza skrzynia znajduje się na miejscu docelowym
+     {                                                                     // Zamieniamy tutaj piktogram skrzyni
           chest1 = 36;
      }
      else
           chest1 = 35;
 
-     if ((*cx2 == *sx1 && *cy2 == *sy1) || (*cx2 == *sx2 && *cy2 == *sy2)) // Sprawdza czy druga skrzynia znajduje się na pierwszym miejscu docelowym
+     if ((*cx2 == *sx1 && *cy2 == *sy1) || (*cx2 == *sx2 && *cy2 == *sy2)) // Sprawdza czy druga skrzynia znajduje się na miejscu docelowym
      {
           chest2 = 36;
      }
@@ -136,10 +274,157 @@ void onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2
           chest2 = 35;
 }
 
-void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2, int *cameraX, int *cameraY, char tab[mapY][mapX])
+void schowSteps(int *heroX, int *heroY, int *tempX, int *tempY, int steps, int *stepsUsed, int pastMoves[10][2], int *counter) // Wyświetlanie liczby kroków i logika związana z krokami
+{
+     int stepsLeft;
+
+     if (*heroX != *tempX || *heroY != *tempY)
+     {
+          pastMoves[*counter][0] = *tempX;
+          pastMoves[*counter][1] = *tempY;
+
+          *tempX = *heroX;
+          *tempY = *heroY;
+          (*stepsUsed)++;
+
+          (*counter)++;
+          if (*counter == 10)
+          {
+               *counter = 0;
+          }
+     }
+
+     stepsLeft = steps - *stepsUsed;
+     cout << "Pozostalo krokow: " << stepsLeft << " \n";
+
+     if (stepsLeft == 0)
+     {
+          endScreen();
+     }
+}
+
+void fillTable(int tab[10][2])
+{
+     for (int i = 0; i < 10; i++)
+     {
+          for (int j = 0; j < 2; j++)
+          {
+               tab[i][j] = 0;
+          }
+     }
+}
+
+void genLevel(char tab[mapY][mapX], level lvl, level lvl1, level lvl2, level lvl3)
+{
+     int pastMoves[10][2];
+     int counter = 0;
+     int amount = 0;
+
+     fillTable(pastMoves);
+
+     while (1)
+     {
+          fillMap(tab, lvl.fileName);
+          genBlock(lvl.spotOneY, lvl.spotOneX, tab, 0, &lvl.chest1);
+          genBlock(lvl.spotTwoY, lvl.spotTwoX, tab, 0, &lvl.chest2);
+          genBlock(lvl.heroY, lvl.heroX, tab, 2, &lvl.chest1);
+          genBlock(lvl.chestOneY, lvl.chestOneX, tab, 1, &lvl.chest1);
+          genBlock(lvl.chestTwoY, lvl.chestTwoX, tab, 1, &lvl.chest2);
+          genMap(tab, &lvl.camX, &lvl.camY);
+          schowSteps(&lvl.heroX, &lvl.heroY, &lvl.tempX, &lvl.tempY, lvl.steps, &lvl.stepsUsed, pastMoves, &counter);
+          action(&lvl.heroY, &lvl.heroX, &lvl.chestOneX, &lvl.chestOneY, &lvl.chestTwoX, &lvl.chestTwoY, &lvl.spotOneX, &lvl.spotOneY, &lvl.spotTwoX, &lvl.spotTwoY, lvl.chest1, lvl.chest2, &lvl.camX, &lvl.camY, lvl1, lvl2, lvl3, pastMoves, &counter, tab);
+          winCheck(tab, &lvl.chest1, &lvl.chest2, lvl, lvl1, lvl2, lvl3);
+     }
+}
+
+void genMenu(char tab[mapY][mapX], level lvl1, level lvl2, level lvl3)
+{
+     system("cls");
+     cout << "Wybierz:"
+          << "\n";
+     cout << "(1) Wybierz poziom"
+          << "\n";
+     cout << "(2) Opusc gre"
+          << "\n";
+
+     while (1)
+     {
+          char znak;
+          int dot1 = 248, dot2 = 248;
+          cin >> znak;
+
+          if (lvl2.locked == false) // odpowiada za kropki w menu sygnalizujace czy odblokowalismy poziom
+          {
+               dot1 = 42;
+          }
+          if (lvl3.locked == false)
+          {
+               dot2 = 42;
+          }
+
+          if (znak == 49)
+          {
+               system("CLS");
+               cout << "Wybierz: "
+                    << "\n"
+                    << "(1) Poziom 1 " << static_cast<char>(42)
+                    << "\n"
+                    << "(2) Poziom 2 " << static_cast<char>(dot1)
+                    << "\n"
+                    << "(3) Poziom 3 " << static_cast<char>(dot2)
+                    << "\n";
+
+               cin >> znak;
+               if (znak == 49)
+               {
+                    genLevel(tab, lvl1, lvl1, lvl2, lvl3);
+               }
+               if (znak == 50)
+               {
+                    if (lvl2.locked != true)
+                    {
+                         genLevel(tab, lvl2, lvl1, lvl2, lvl3);
+                    }
+                    else
+                    {
+                         cout << "Nie odblokowales jeszcze tego poziomu!";
+                         Sleep(3000);
+                         genMenu(tab, lvl1, lvl2, lvl3);
+                    }
+               }
+               if (znak == 51)
+               {
+                    if (lvl3.locked != true)
+                    {
+                         genLevel(tab, lvl3, lvl1, lvl2, lvl3);
+                    }
+                    else
+                    {
+                         cout << "Nie odblokowales jeszcze tego poziomu!";
+                         Sleep(3000);
+                         genMenu(tab, lvl1, lvl2, lvl3);
+                    }
+               }
+          }
+          else if (znak == 50)
+          {
+               exit(0);
+          }
+          else
+          {
+               cout << "Wybrales niepoprawny znak! Mozesz wybrac 1 lub 2."
+                    << "\n";
+               Sleep(1000);
+               genMenu(tab, lvl1, lvl2, lvl3);
+          }
+     }
+}
+
+void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2, int *cameraX, int *cameraY, level lvl1, level lvl2, level lvl3, int pastMoves[10][2], int *counter, char tab[mapY][mapX])
 {
      cout << "Wprowadz znak: ";
      char znak = getch();
+
      cout << znak;
 
      if (znak == 119 || znak == 87) // instrukcje dla "W" i "w" RUCH GÓRA
@@ -285,182 +570,19 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
 
      if (znak == 113 || znak == 81) // instrukcja dla "Q" i "q" MENU
      {
-          cout << "Do naprawienia";
+          genMenu(tab, lvl1, lvl2, lvl3);
+     }
+
+     if (znak == 117 || znak == 85) // instruckcja dla "U" i "u" UNDO
+     {
+          cout << *counter;
+          *x = pastMoves[*counter][0];
+          *y = pastMoves[*counter][1];
+     }
+
+     if (znak == 114 || znak == 82) // instruckcja dla "R" i "r" REDO
+     {
      }
 
      onSpot(cx1, cy1, cx2, cy2, sx1, sy1, sx2, sy2, chest1, chest2);
-}
-
-void schowSteps(int *heroX, int *heroY, int *tempX, int *tempY, int steps, int *stepsUsed) // Wyświetlanie liczby kroków i logika związana z krokami
-{
-     int stepsLeft;
-
-     if (*heroX != *tempX || *heroY != *tempY)
-     {
-          *tempX == *heroX;
-          *tempY == *heroY;
-          (*stepsUsed)++;
-     }
-     stepsLeft = steps - *stepsUsed;
-     cout << "Pozostalo krokow: " << stepsLeft << " \n";
-
-     if (stepsLeft == 0)
-     {
-          system("CLS");
-          cout << "PRZEGRANA"
-               << "\n"
-               << "BRAK RUCHOW";
-          getchar();
-     }
-}
-
-void genLevel(char tab[mapY][mapX], level lvl)
-{
-     while (1)
-     {
-          fillMap(tab, lvl.fileName);
-          genBlock(lvl.spotOneY, lvl.spotOneX, tab, 0, &lvl.chest1);
-          genBlock(lvl.spotTwoY, lvl.spotTwoX, tab, 0, &lvl.chest2);
-          genBlock(lvl.heroY, lvl.heroX, tab, 2, &lvl.chest1);
-          genBlock(lvl.chestOneY, lvl.chestOneX, tab, 1, &lvl.chest1);
-          genBlock(lvl.chestTwoY, lvl.chestTwoX, tab, 1, &lvl.chest2);
-          genMap(tab, &lvl.camX, &lvl.camY);
-          schowSteps(&lvl.heroX, &lvl.heroY, &lvl.tempX, &lvl.tempY, lvl.steps, &lvl.stepsUsed);
-          action(&lvl.heroY, &lvl.heroX, &lvl.chestOneX, &lvl.chestOneY, &lvl.chestTwoX, &lvl.chestTwoY, &lvl.spotOneX, &lvl.spotOneY, &lvl.spotTwoX, &lvl.spotTwoY, lvl.chest1, lvl.chest2, &lvl.camX, &lvl.camY, tab);
-
-          if (lvl.chest1 == 36 && lvl.chest2 == 36)
-          {
-               break;
-          }
-     }
-}
-
-int genMenu(char tab[mapY][mapX], level lvl1, level lvl2, level lvl3)
-{
-     system("cls");
-     cout << "Wybierz:"
-          << "\n";
-     cout << "(1) Wybierz poziom"
-          << "\n";
-     cout << "(2) Opusc gre"
-          << "\n";
-
-     while (1)
-     {
-          char znak;
-          cin >> znak;
-
-          if (znak == 49)
-          {
-               system("CLS");
-               cout << "Wybierz: "
-                    << "\n"
-                    << "(1) Poziom 1"
-                    << "\n"
-                    << "(2) Poziom 2"
-                    << "\n"
-                    << "(3) Poziom 3"
-                    << "\n";
-
-               cin >> znak;
-               if (znak == 49)
-               {
-                    genLevel(tab, lvl1);
-               }
-               if (znak == 50)
-               {
-                    genLevel(tab, lvl2);
-               }
-               if (znak == 51)
-               {
-                    genLevel(tab, lvl3);
-               }
-          }
-          else if (znak == 50)
-          {
-               exit(0);
-          }
-          else
-          {
-               cout << "Wybrales niepoprawny znak! Mozesz wybrac 1 lub 2."
-                    << "\n";
-               Sleep(1000);
-               genMenu(tab, lvl1, lvl2, lvl3);
-          }
-     }
-}
-
-int main()
-{
-     char mainMap[mapY][mapX];
-
-     level lvlOne;
-     level lvlTwo;
-     level lvlThree;
-
-     lvlOne.heroX = 24; // Definicja wartości dla pierwszego poziomu
-     lvlOne.heroY = 17;
-     lvlOne.tempX = 24;
-     lvlOne.tempY = 17;
-     lvlOne.chestOneX = 39;
-     lvlOne.chestOneY = 8;
-     lvlOne.chestTwoX = 39;
-     lvlOne.chestTwoY = 11;
-     lvlOne.spotOneX = 27;
-     lvlOne.spotOneY = 5;
-     lvlOne.spotTwoX = 30;
-     lvlOne.spotTwoY = 5;
-     lvlOne.chest1 = 35;
-     lvlOne.chest2 = 35;
-     lvlOne.steps = 25;
-     lvlOne.stepsUsed = 0;
-     lvlOne.camX = 0;
-     lvlOne.camY = 0;
-     strcpy(lvlOne.fileName, "level1.txt");
-
-     lvlTwo.heroY = 13; // Definicja wartości dla drugiego poziomu
-     lvlTwo.heroX = 23;
-     lvlTwo.tempX = 23;
-     lvlTwo.tempY = 13;
-     lvlTwo.chestOneX = 68;
-     lvlTwo.chestOneY = 7;
-     lvlTwo.chestTwoX = 80;
-     lvlTwo.chestTwoY = 19;
-     lvlTwo.spotOneX = 8;
-     lvlTwo.spotOneY = 4;
-     lvlTwo.spotTwoX = 26;
-     lvlTwo.spotTwoY = 4;
-     lvlTwo.chest1 = 35;
-     lvlTwo.chest2 = 35;
-     lvlTwo.steps = 60;
-     lvlTwo.stepsUsed = 0;
-     lvlTwo.camX = 0;
-     lvlTwo.camY = 0;
-     strcpy(lvlTwo.fileName, "level2.txt");
-
-     lvlThree.heroY = 21; // Definicja wartości dla trzeciego poziomu
-     lvlThree.heroX = 23;
-     lvlThree.tempX = 23;
-     lvlThree.tempY = 23;
-     lvlThree.chestOneX = 35;
-     lvlThree.chestOneY = 24;
-     lvlThree.chestTwoX = 92;
-     lvlThree.chestTwoY = 21;
-     lvlThree.spotOneX = 89;
-     lvlThree.spotOneY = 3;
-     lvlThree.spotTwoX = 89;
-     lvlThree.spotTwoY = 6;
-     lvlThree.chest1 = 35;
-     lvlThree.chest2 = 35;
-     lvlThree.steps = 400;
-     lvlThree.stepsUsed = 0;
-     lvlThree.camX = 0;
-     lvlThree.camY = 0;
-     strcpy(lvlThree.fileName, "level3.txt");
-
-     // startScreen();
-
-     genMenu(mainMap, lvlOne, lvlTwo, lvlThree);
-
-     return 0;
 }
