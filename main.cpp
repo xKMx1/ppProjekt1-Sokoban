@@ -22,8 +22,8 @@ struct level
      int spotOneY;
      int spotTwoX;
      int spotTwoY;
-     int chest1;
-     int chest2;
+     int chestPictoBad;
+     int chestPictoGood;
      int steps;
      int stepsUsed;
      int camX;
@@ -34,6 +34,8 @@ struct level
 
 const int mapX = 120;
 const int mapY = 35;
+const int tabX = 10;
+const int tabY = 2;
 
 void ClearScreen()
 {
@@ -46,15 +48,15 @@ void startScreen();
 void endScreen();
 void winScreen();
 void winCheck(int *chestPicto1, int *chestPicto2, level lvl1, level lvl2, level lvl3);
-void fillTable(int tab[10][2]);
+void fillTable(int tab[tabX][tabY]);
 void genBlock(int y, int x, char tab[mapY][mapX], int var, int *chest);
 void fillMap(char tab[mapY][mapX], char path[11]);
 void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY);
-void onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2);
-void schowSteps(int *heroX, int *heroY, int *tempX, int *tempY, int steps, int *stepsUsed);
+void onSpot(level lvl);
+void schowSteps(int *heroX, int *heroY, int *tempX, int *tempY, int steps, int *stepsUsed, bool flag);
 void genLevel(char tab[mapY][mapX], level lvl, level lvl1, level lvl2, level lvl3);
 void genMenu(char tab[mapY][mapX], level lvl1, level lvl2, level lvl3);
-void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2, int *cameraX, int *cameraY, level lvl1, level lvl2, level lvl3, int pastMoves[10][2], int *counter, char tab[mapY][mapX]);
+void action(level *lvl, level lvl1, level lvl2, level lvl3, int pastMoves[tabX][tabY], int *counter, int *z, bool *flag, char tab[mapY][mapX]);
 
 int main()
 {
@@ -77,8 +79,8 @@ int main()
      lvlOne.spotOneY = 5;
      lvlOne.spotTwoX = 30;
      lvlOne.spotTwoY = 5;
-     lvlOne.chest1 = 35;
-     lvlOne.chest2 = 35;
+     lvlOne.chestPictoBad = 35;
+     lvlOne.chestPictoGood = 35;
      lvlOne.steps = 50;
      lvlOne.stepsUsed = 0;
      lvlOne.camX = 0;
@@ -99,8 +101,8 @@ int main()
      lvlTwo.spotOneY = 4;
      lvlTwo.spotTwoX = 26;
      lvlTwo.spotTwoY = 4;
-     lvlTwo.chest1 = 35;
-     lvlTwo.chest2 = 35;
+     lvlTwo.chestPictoBad = 35;
+     lvlTwo.chestPictoGood = 35;
      lvlTwo.steps = 160;
      lvlTwo.stepsUsed = 0;
      lvlTwo.camX = 0;
@@ -121,8 +123,8 @@ int main()
      lvlThree.spotOneY = 3;
      lvlThree.spotTwoX = 89;
      lvlThree.spotTwoY = 6;
-     lvlThree.chest1 = 35;
-     lvlThree.chest2 = 35;
+     lvlThree.chestPictoBad = 35;
+     lvlThree.chestPictoGood = 35;
      lvlThree.steps = 400;
      lvlThree.stepsUsed = 0;
      lvlThree.camX = 0;
@@ -178,7 +180,7 @@ void winScreen() // funkcja wyswietlajaca ekran wygranej
 
 void winCheck(char tab[mapY][mapX], int *chestPicto1, int *chestPicto2, level lvl, level lvl1, level lvl2, level lvl3)
 {
-     if (lvl.chest1 == 36 && lvl.chest2 == 36)
+     if (lvl.chestPictoBad == 36 && lvl.chestPictoGood == 36)
      {
           if (lvl.lvlId == lvl1.lvlId)
           {
@@ -257,37 +259,41 @@ void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY) // funkcja wypisuj
      cout << "\n";
 }
 
-void onSpot(int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2) // funkcja sprawdzająca położenie skrzyń
+void onSpot(level lvl) // funkcja sprawdzająca położenie skrzyń
 {
-     if ((*cx1 == *sx1 && *cy1 == *sy1) || (*cx1 == *sx2 && *cy1 == *sy2)) // Sprawdza czy pierwsza skrzynia znajduje się na miejscu docelowym
-     {                                                                     // Zamieniamy tutaj piktogram skrzyni
-          chest1 = 36;
+     if ((lvl.chestOneX == lvl.spotOneX && lvl.chestOneY == lvl.spotOneY) || (lvl.chestOneX == lvl.spotTwoX && lvl.chestOneY == lvl.spotTwoY)) // Sprawdza czy pierwsza skrzynia znajduje się na miejscu docelowym
+     {                                                                                                                                         // Zamieniamy tutaj piktogram skrzyni
+          lvl.chestPictoBad = 36;
      }
      else
-          chest1 = 35;
+          lvl.chestPictoBad = 35;
 
-     if ((*cx2 == *sx1 && *cy2 == *sy1) || (*cx2 == *sx2 && *cy2 == *sy2)) // Sprawdza czy druga skrzynia znajduje się na miejscu docelowym
+     if ((lvl.chestTwoX == lvl.spotOneX && lvl.chestTwoY == lvl.spotOneY) || (lvl.chestTwoX == lvl.spotTwoX && lvl.chestTwoY == lvl.spotTwoY)) // Sprawdza czy druga skrzynia znajduje się na miejscu docelowym
      {
-          chest2 = 36;
+          lvl.chestPictoGood = 36;
      }
      else
-          chest2 = 35;
+          lvl.chestPictoGood = 35;
 }
 
-void schowSteps(int *heroX, int *heroY, int *tempX, int *tempY, int steps, int *stepsUsed, int pastMoves[10][2], int *counter) // Wyświetlanie liczby kroków i logika związana z krokami
+void schowSteps(int *heroX, int *heroY, int *tempX, int *tempY, int steps, int *stepsUsed, int pastMoves[tabX][tabY], int *counter, bool flag) // Wyświetlanie liczby kroków i logika związana z krokami
 {
      int stepsLeft;
 
      if (*heroX != *tempX || *heroY != *tempY)
      {
-          pastMoves[*counter][0] = *tempX;
-          pastMoves[*counter][1] = *tempY;
+          if (flag == false)
+          {
+               (*counter)++;
+          }
+
+          pastMoves[*counter - 1][0] = *tempX;
+          pastMoves[*counter - 1][1] = *tempY;
 
           *tempX = *heroX;
           *tempY = *heroY;
           (*stepsUsed)++;
 
-          (*counter)++;
           if (*counter == 10)
           {
                *counter = 0;
@@ -297,17 +303,26 @@ void schowSteps(int *heroX, int *heroY, int *tempX, int *tempY, int steps, int *
      stepsLeft = steps - *stepsUsed;
      cout << "Pozostalo krokow: " << stepsLeft << " \n";
 
+     for (int i = 0; i < 10; i++)
+     {
+          for (int j = 0; j < 2; j++)
+          {
+               cout << pastMoves[i][j] << " ";
+          }
+          cout << "\n";
+     }
+
      if (stepsLeft == 0)
      {
           endScreen();
      }
 }
 
-void fillTable(int tab[10][2])
+void fillTable(int tab[tabX][tabY])
 {
-     for (int i = 0; i < 10; i++)
+     for (int i = 0; i < tabX; i++)
      {
-          for (int j = 0; j < 2; j++)
+          for (int j = 0; j < tabY; j++)
           {
                tab[i][j] = 0;
           }
@@ -316,24 +331,25 @@ void fillTable(int tab[10][2])
 
 void genLevel(char tab[mapY][mapX], level lvl, level lvl1, level lvl2, level lvl3)
 {
-     int pastMoves[10][2];
+     int pastMoves[tabX][tabY];
      int counter = 0;
-     int amount = 0;
+     int z = 1;
+     bool lastMoveUndo = false;
 
      fillTable(pastMoves);
 
      while (1)
      {
           fillMap(tab, lvl.fileName);
-          genBlock(lvl.spotOneY, lvl.spotOneX, tab, 0, &lvl.chest1);
-          genBlock(lvl.spotTwoY, lvl.spotTwoX, tab, 0, &lvl.chest2);
-          genBlock(lvl.heroY, lvl.heroX, tab, 2, &lvl.chest1);
-          genBlock(lvl.chestOneY, lvl.chestOneX, tab, 1, &lvl.chest1);
-          genBlock(lvl.chestTwoY, lvl.chestTwoX, tab, 1, &lvl.chest2);
+          genBlock(lvl.spotOneY, lvl.spotOneX, tab, 0, &lvl.chestPictoBad);
+          genBlock(lvl.spotTwoY, lvl.spotTwoX, tab, 0, &lvl.chestPictoGood);
+          genBlock(lvl.heroY, lvl.heroX, tab, 2, &lvl.chestPictoBad);
+          genBlock(lvl.chestOneY, lvl.chestOneX, tab, 1, &lvl.chestPictoBad);
+          genBlock(lvl.chestTwoY, lvl.chestTwoX, tab, 1, &lvl.chestPictoGood);
           genMap(tab, &lvl.camX, &lvl.camY);
-          schowSteps(&lvl.heroX, &lvl.heroY, &lvl.tempX, &lvl.tempY, lvl.steps, &lvl.stepsUsed, pastMoves, &counter);
-          action(&lvl.heroY, &lvl.heroX, &lvl.chestOneX, &lvl.chestOneY, &lvl.chestTwoX, &lvl.chestTwoY, &lvl.spotOneX, &lvl.spotOneY, &lvl.spotTwoX, &lvl.spotTwoY, lvl.chest1, lvl.chest2, &lvl.camX, &lvl.camY, lvl1, lvl2, lvl3, pastMoves, &counter, tab);
-          winCheck(tab, &lvl.chest1, &lvl.chest2, lvl, lvl1, lvl2, lvl3);
+          schowSteps(&lvl.heroX, &lvl.heroY, &lvl.tempX, &lvl.tempY, lvl.steps, &lvl.stepsUsed, pastMoves, &counter, lastMoveUndo);
+          action(&lvl, lvl1, lvl2, lvl3, pastMoves, &counter, &z, &lastMoveUndo, tab);
+          winCheck(tab, &lvl.chestPictoBad, &lvl.chestPictoGood, lvl, lvl1, lvl2, lvl3);
      }
 }
 
@@ -420,7 +436,7 @@ void genMenu(char tab[mapY][mapX], level lvl1, level lvl2, level lvl3)
      }
 }
 
-void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2, int *cameraX, int *cameraY, level lvl1, level lvl2, level lvl3, int pastMoves[10][2], int *counter, char tab[mapY][mapX])
+void action(level *lvl, level lvl1, level lvl2, level lvl3, int pastMoves[tabX][tabY], int *counter, int *z, bool *flag, char tab[mapY][mapX])
 {
      cout << "Wprowadz znak: ";
      char znak = getch();
@@ -429,160 +445,197 @@ void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, in
 
      if (znak == 119 || znak == 87) // instrukcje dla "W" i "w" RUCH GÓRA
      {
-          if (tab[*y - 1][*x] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
+          if (tab[lvl->heroY - 1][lvl->heroX] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
           {
-               if (*y == *cy1 + 3 && *x == *cx1) // sprawdzamy czy nie stoi obok nas skrzynia 1
+               if (lvl->heroY == lvl->chestOneY + 3 && lvl->heroX == lvl->chestOneX) // sprawdzamy czy nie stoi obok nas skrzynia 1
                {
-                    if ((tab[*y - 4][*x] != 48) && (tab[*y - 4][*x] != 35) && (tab[*y - 4][*x] != 36)) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if ((tab[lvl->heroY - 4][lvl->heroX] != 48) && (tab[lvl->heroY - 4][lvl->heroX] != 35) && (tab[lvl->heroY - 4][lvl->heroX] != 36)) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
-                         *y -= 3;
-                         *cy1 -= 3;
+                         lvl->heroY -= 3;
+                         lvl->chestOneY -= 3;
+                         *flag = false;
+                         *z = 1;
                     }
                }
-               else if (*y == *cy2 + 3 && *x == *cx2) // sprawdzamy czy nie stoi obok nas skrzynia 2
+               else if (lvl->heroY == lvl->chestTwoY + 3 && lvl->heroX == lvl->chestTwoX) // sprawdzamy czy nie stoi obok nas skrzynia 2
                {
-                    if (tab[*y - 4][*x] != 48 && (tab[*y - 4][*x] != 35) && (tab[*y - 4][*x] != 36)) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY - 4][lvl->heroX] != 48 && (tab[lvl->heroY - 4][lvl->heroX] != 35) && (tab[lvl->heroY - 4][lvl->heroX] != 36)) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
-                         *y -= 3;
-                         *cy2 -= 3;
+                         lvl->heroY -= 3;
+                         lvl->chestTwoY -= 3;
+                         *flag = false;
+                         *z = 1;
                     }
                }
                else
                {
-                    *y -= 3;
+                    lvl->heroY -= 3;
+                    *flag = false;
+                    *z = 1;
                }
           }
      }
 
      if (znak == 115 || znak == 83) // instrukcje dla "S" i "s" RUCH DÓŁ
      {
-          if (tab[*y + 3][*x] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
+          if (tab[lvl->heroY + 3][lvl->heroX] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
           {
-               if (*y == *cy1 - 3 && *x == *cx1) // sprawdzamy czy nie stoi obok nas skrzynia 1
+               if (lvl->heroY == lvl->chestOneY - 3 && lvl->heroX == lvl->chestOneX) // sprawdzamy czy nie stoi obok nas skrzynia 1
                {
-                    if (tab[*y + 6][*x] != 48 && tab[*y + 6][*x] != 35 && tab[*y + 6][*x] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY + 6][lvl->heroX] != 48 && tab[lvl->heroY + 6][lvl->heroX] != 35 && tab[lvl->heroY + 6][lvl->heroX] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
-                         *y += 3;
-                         *cy1 += 3;
+                         lvl->heroY += 3;
+                         lvl->chestOneY += 3;
+                         *flag = false;
+                         *z = 1;
                     }
                }
-               else if (*y == *cy2 - 3 && *x == *cx2) // sprawdzamy czy nie stoi obok nas skrzynia 2
+               else if (lvl->heroY == lvl->chestTwoY - 3 && lvl->heroX == lvl->chestTwoX) // sprawdzamy czy nie stoi obok nas skrzynia 2
                {
-                    if (tab[*y + 6][*x] != 48 && tab[*y + 6][*x] != 35 && tab[*y + 6][*x] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY + 6][lvl->heroX] != 48 && tab[lvl->heroY + 6][lvl->heroX] != 35 && tab[lvl->heroY + 6][lvl->heroX] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
-                         *y += 3;
-                         *cy2 += 3;
+                         lvl->heroY += 3;
+                         lvl->chestTwoY += 3;
+                         *flag = false;
+                         *z = 1;
                     }
                }
                else
                {
-                    *y += 3;
+                    lvl->heroY += 3;
+                    *flag = false;
+                    *z = 1;
                }
           }
      }
 
-     if (znak == 97 || znak == 65) // instrukcje dla "A" i "a" RUCH LEWO
+     if (znak == 97 || znak == 65) // instrukcje dla "A" i "a" RUCH LEW1
      {
-          if (tab[*y][*x - 1] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
+          if (tab[lvl->heroY][lvl->heroX - 1] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
           {
 
-               if (*y == *cy1 && *x == (*cx1 + 3)) // sprawdzamy czy nie stoi obok nas skrzynia 1
+               if (lvl->heroY == lvl->chestOneY && lvl->heroX == (lvl->chestOneX + 3)) // sprawdzamy czy nie stoi obok nas skrzynia 1
                {
-                    if (tab[*y][*x - 4] != 48 && tab[*y][*x - 4] != 35 && tab[*y][*x - 4] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY][lvl->heroX - 4] != 48 && tab[lvl->heroY][lvl->heroX - 4] != 35 && tab[lvl->heroY][lvl->heroX - 4] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
-                         *x -= 3;
-                         *cx1 -= 3;
+                         lvl->heroX -= 3;
+                         lvl->chestOneX -= 3;
+                         *flag = false;
+                         *z = 1;
                     }
                }
-               else if (*y == *cy2 && *x == (*cx2 + 3)) // sprawdzamy czy nie stoi obok nas skrzynia 2
+               else if (lvl->heroY == lvl->chestTwoY && lvl->heroX == (lvl->chestTwoX + 3)) // sprawdzamy czy nie stoi obok nas skrzynia 2
                {
-                    if (tab[*y][*x - 4] != 48 && tab[*y][*x - 4] != 35 && tab[*y][*x - 4] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY][lvl->heroX - 4] != 48 && tab[lvl->heroY][lvl->heroX - 4] != 35 && tab[lvl->heroY][lvl->heroX - 4] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
-                         *x -= 3;
-                         *cx2 -= 3;
+                         lvl->heroX -= 3;
+                         lvl->chestTwoX -= 3;
+                         *flag = false;
+                         *z = 1;
                     }
                }
                else
                {
-                    *x -= 3;
+                    lvl->heroX -= 3;
+                    *flag = false;
+                    *z = 1;
                }
           }
      }
 
      if (znak == 100 || znak == 68) // instrukcje dla "D" i "d" RUCH PRAWO
      {
-          if (tab[*y][*x + 3] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
+          if (tab[lvl->heroY][lvl->heroX + 3] != 48) // sprawdzamy czy nie jesteśmy przy ścianie
           {
-               if (*y == *cy1 && *x == (*cx1 - 3)) // sprawdzamy czy nie stoi obok nas skrzynia 1
+               if (lvl->heroY == lvl->chestOneY && lvl->heroX == (lvl->chestOneX - 3)) // sprawdzamy czy nie stoi obok nas skrzynia 1
                {
-                    if (tab[*y][*x + 6] != 48 && tab[*y][*x + 6] != 35 && tab[*y][*x + 6] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY][lvl->heroX + 6] != 48 && tab[lvl->heroY][lvl->heroX + 6] != 35 && tab[lvl->heroY][lvl->heroX + 6] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
-                         *x += 3;
-                         *cx1 += 3;
+                         lvl->heroX += 3;
+                         lvl->chestOneX += 3;
+                         *flag = false;
+                         *z = 1;
                     }
                }
-               else if (*y == *cy2 && *x == (*cx2 - 3)) // sprawdzamy czy nie stoi obok nas skrzynia 2
+               else if (lvl->heroY == lvl->chestTwoY && lvl->heroX == (lvl->chestTwoX - 3)) // sprawdzamy czy nie stoi obok nas skrzynia 2
                {
-                    if (tab[*y][*x + 6] != 48 && tab[*y][*x + 6] != 35 && tab[*y][*x + 6] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY][lvl->heroX + 6] != 48 && tab[lvl->heroY][lvl->heroX + 6] != 35 && tab[lvl->heroY][lvl->heroX + 6] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
-                         *x += 3;
-                         *cx2 += 3;
+                         lvl->heroX += 3;
+                         lvl->chestTwoX += 3;
+                         *flag = false;
+                         *z = 1;
                     }
                }
                else
                {
-                    *x += 3;
+                    lvl->heroX += 3;
+                    *flag = false;
+                    *z = 1;
                }
           }
      }
 
      if (znak == 106 || znak == 74) // instrukcja dla "J" i "j" KAMERA LEWO
      {
-          if (*cameraX != 0) // ogranicza wyjście kamery za mapę
+          if (lvl->camX != 0) // ogranicza wyjście kamery za mapę
           {
-               (*cameraX)--;
+               (lvl->camX)--;
           }
      }
 
      if (znak == 107 || znak == 75) // instrukcja dla "K" i "k" KAMERA PRAWO
      {
-          if (*cameraX != 39) // ogranicza wyjście kamery za mapę
+          if (lvl->camX != 39) // ogranicza wyjście kamery za mapę
           {
-               (*cameraX)++;
+               (lvl->camX)++;
           }
      }
 
      if (znak == 105 || znak == 73) // instrukcja dla "I" i "i" KAMERA GÓRA
      {
-          if (*cameraY != 0) // ogranicza wyjście kamery za mapę
+          if (lvl->camY != 0) // ogranicza wyjście kamery za mapę
           {
-               (*cameraY)--;
+               (lvl->camY)--;
           }
      }
 
      if (znak == 109 || znak == 77) // instrukcja dla "M" i "m" KAMERA DÓŁ
      {
-          if (*cameraY != 10) // ogranicza wyjście kamery za mapę
+          if (lvl->camY != 10) // ogranicza wyjście kamery za mapę
           {
-               (*cameraY)++;
+               (lvl->camY)++;
           }
      }
 
      if (znak == 113 || znak == 81) // instrukcja dla "Q" i "q" MENU
      {
+          *flag = false;
           genMenu(tab, lvl1, lvl2, lvl3);
      }
 
      if (znak == 117 || znak == 85) // instruckcja dla "U" i "u" UNDO
      {
-          cout << *counter;
-          *x = pastMoves[*counter][0];
-          *y = pastMoves[*counter][1];
+          if ((*counter - *z) < 0)
+          {
+               *z = *counter - *z;
+          }
+          if (*counter >= *z)
+          {
+               lvl->heroX = pastMoves[(*counter - *z) % tabX][0];
+               lvl->heroY = pastMoves[(*counter - *z) % tabX][1];
+               (*z)++;
+               *flag = true;
+          }
+          else
+          {
+               cout << "Nie mozna cofnac ruchu";
+          }
      }
 
      if (znak == 114 || znak == 82) // instruckcja dla "R" i "r" REDO
      {
      }
 
-     onSpot(cx1, cy1, cx2, cy2, sx1, sy1, sx2, sy2, chest1, chest2);
+     onSpot(*lvl);
 }
