@@ -8,4 +8,4 @@ TODO
 - Naprawić generowanie menu przy błędnych znakach
 - Dodać nienachodzenie na siebie skrzyń
 - usunąć biblioteki z .h c.
-- naprawić zliczanie ruchu przy ruchu w ścianę
+- naprawić zliczanie ruchu

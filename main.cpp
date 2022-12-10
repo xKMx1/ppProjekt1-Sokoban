@@ -44,16 +44,19 @@ void ClearScreen()
 void startScreen()
 { // funkcja wyswietlajaca ekran powitalny
      system("CLS");
-     cout << "\n"
-          << "SOKOBAN"
-          << "\n";
-     cout << "Kamil Ratajczyk"
-          << "\n";
-     cout << "s193345"
-          << "\n";
 
-     Sleep(1000);
-     system("CLS");
+     cout << "  /$$$$$$            /$$                 /$$                          " << endl;
+     cout << " /$$__  $$          | $$                | $$                          " << endl;
+     cout << "| $$  " << char(92) << "__/  /$$$$$$ | $$   /$$  /$$$$$$ | $$$$$$$   /$$$$$$  /$$$$$$$ " << endl;
+     cout << "|  $$$$$$  /$$__  $$| $$  /$$/ /$$__  $$| $$__  $$ |____  $$| $$__  $$" << endl;
+     cout << " " << char(92) << "____  $$| $$  " << char(92) << " $$| $$$$$$/ | $$  " << char(92) << " $$| $$  " << char(92) << " $$  /$$$$$$$| $$  " << char(92) << " $$" << endl;
+     cout << " /$$  " << char(92) << " $$| $$  | $$| $$_  $$ | $$  | $$| $$  | $$ /$$__  $$| $$  | $$" << endl;
+     cout << "|  $$$$$$/|  $$$$$$/| $$ " << char(92) << "  $$|  $$$$$$/| $$$$$$$/|  $$$$$$$| $$  | $$" << endl;
+     cout << " " << char(92) << "______/  " << char(92) << "______/ |__/  " << char(92) << "__/ " << char(92) << "______/ |_______/  " << char(92) << "_______/|__/  |__/" << endl
+          << endl;
+     cout << "                        Kamil Ratajczyk s193345                                                                             ";
+
+     Sleep(3000);
 }
 
 void genBlock(int y, int x, char tab[mapY][mapX], int var, int *chest)
@@ -395,7 +398,7 @@ int main()
      level lvlTwo;
      level lvlThree;
 
-     lvlOne.heroX = 24;
+     lvlOne.heroX = 24; // Definicja wartości dla pierwszego poziomu
      lvlOne.heroY = 17;
      lvlOne.tempX = 24;
      lvlOne.tempY = 17;
@@ -415,7 +418,7 @@ int main()
      lvlOne.camY = 0;
      strcpy(lvlOne.fileName, "level1.txt");
 
-     lvlTwo.heroY = 13;
+     lvlTwo.heroY = 13; // Definicja wartości dla drugiego poziomu
      lvlTwo.heroX = 23;
      lvlTwo.tempX = 23;
      lvlTwo.tempY = 13;
@@ -434,6 +437,26 @@ int main()
      lvlTwo.camX = 0;
      lvlTwo.camY = 0;
      strcpy(lvlTwo.fileName, "level2.txt");
+
+     lvlThree.heroY = 21; // Definicja wartości dla trzeciego poziomu
+     lvlThree.heroX = 23;
+     lvlThree.tempX = 23;
+     lvlThree.tempY = 23;
+     lvlThree.chestOneX = 35;
+     lvlThree.chestOneY = 24;
+     lvlThree.chestTwoX = 92;
+     lvlThree.chestTwoY = 21;
+     lvlThree.spotOneX = 89;
+     lvlThree.spotOneY = 3;
+     lvlThree.spotTwoX = 89;
+     lvlThree.spotTwoY = 6;
+     lvlThree.chest1 = 35;
+     lvlThree.chest2 = 35;
+     lvlThree.steps = 400;
+     lvlThree.stepsUsed = 0;
+     lvlThree.camX = 0;
+     lvlThree.camY = 0;
+     strcpy(lvlThree.fileName, "level3.txt");
 
      // startScreen();
 
