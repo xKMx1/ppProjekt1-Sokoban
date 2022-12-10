@@ -22,8 +22,8 @@ struct level
      int spotOneY;
      int spotTwoX;
      int spotTwoY;
-     int chestPictoBad;
-     int chestPictoGood;
+     int chestPictoOne;
+     int chestPictoTwo;
      int steps;
      int stepsUsed;
      int camX;
@@ -53,8 +53,8 @@ void fillTable(int tab[tabX][tabY]);
 void genBlock(int y, int x, char tab[mapY][mapX], int var, int *chest);
 void fillMap(char tab[mapY][mapX], char path[11]);
 void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY);
-void onSpot(level lvl);
-void schowSteps(int *heroX, int *heroY, int *tempX, int *tempY, int steps, int *stepsUsed, bool flag);
+void onSpot(level *lvl);
+void schowSteps(level *lvl, int *stepsUsed, bool flag);
 void genLevel(char tab[mapY][mapX], level lvl, level lvl1, level lvl2, level lvl3);
 void genMenu(char tab[mapY][mapX], level lvl1, level lvl2, level lvl3);
 void action(level *lvl, level lvl1, level lvl2, level lvl3, int pastMoves[tabX][tabY], int *counter, int *z, bool *flag, char tab[mapY][mapX]);
@@ -80,8 +80,8 @@ int main()
      lvlOne.spotOneY = 5;
      lvlOne.spotTwoX = 30;
      lvlOne.spotTwoY = 5;
-     lvlOne.chestPictoBad = 35;
-     lvlOne.chestPictoGood = 35;
+     lvlOne.chestPictoOne = 35;
+     lvlOne.chestPictoTwo = 35;
      lvlOne.steps = 50;
      lvlOne.stepsUsed = 0;
      lvlOne.camX = 0;
@@ -102,8 +102,8 @@ int main()
      lvlTwo.spotOneY = 4;
      lvlTwo.spotTwoX = 26;
      lvlTwo.spotTwoY = 4;
-     lvlTwo.chestPictoBad = 35;
-     lvlTwo.chestPictoGood = 35;
+     lvlTwo.chestPictoOne = 35;
+     lvlTwo.chestPictoTwo = 35;
      lvlTwo.steps = 160;
      lvlTwo.stepsUsed = 0;
      lvlTwo.camX = 0;
@@ -124,8 +124,8 @@ int main()
      lvlThree.spotOneY = 3;
      lvlThree.spotTwoX = 89;
      lvlThree.spotTwoY = 6;
-     lvlThree.chestPictoBad = 35;
-     lvlThree.chestPictoGood = 35;
+     lvlThree.chestPictoOne = 35;
+     lvlThree.chestPictoTwo = 35;
      lvlThree.steps = 400;
      lvlThree.stepsUsed = 0;
      lvlThree.camX = 0;
@@ -179,9 +179,10 @@ void winScreen() // funkcja wyswietlajaca ekran wygranej
      exit(1);
 }
 
-void winCheck(char tab[mapY][mapX], int *chestPicto1, int *chestPicto2, level lvl, level lvl1, level lvl2, level lvl3)
+void winCheck(char tab[mapY][mapX], level lvl, level lvl1, level lvl2, level lvl3)
 {
-     if (lvl.chestPictoBad == 36 && lvl.chestPictoGood == 36)
+     cout << lvl.chestPictoOne << " " << lvl.chestPictoTwo << endl;
+     if (lvl.chestPictoOne == 36 && lvl.chestPictoTwo == 36)
      {
           if (lvl.lvlId == lvl1.lvlId)
           {
@@ -260,39 +261,39 @@ void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY) // funkcja wypisuj
      cout << "\n";
 }
 
-void onSpot(level lvl) // funkcja sprawdzająca położenie skrzyń
+void onSpot(level *lvl) // funkcja sprawdzająca położenie skrzyń
 {
-     if ((lvl.chestOneX == lvl.spotOneX && lvl.chestOneY == lvl.spotOneY) || (lvl.chestOneX == lvl.spotTwoX && lvl.chestOneY == lvl.spotTwoY)) // Sprawdza czy pierwsza skrzynia znajduje się na miejscu docelowym
-     {                                                                                                                                         // Zamieniamy tutaj piktogram skrzyni
-          lvl.chestPictoBad = 36;
+     if ((lvl->chestOneX == lvl->spotOneX && lvl->chestOneY == lvl->spotOneY) || (lvl->chestOneX == lvl->spotTwoX && lvl->chestOneY == lvl->spotTwoY)) // Sprawdza czy pierwsza skrzynia znajduje się na miejscu docelowym
+     {                                                                                                                                                 // Zamieniamy tutaj piktogram skrzyni
+          lvl->chestPictoOne = 36;
      }
      else
-          lvl.chestPictoBad = 35;
+          lvl->chestPictoOne = 35;
 
-     if ((lvl.chestTwoX == lvl.spotOneX && lvl.chestTwoY == lvl.spotOneY) || (lvl.chestTwoX == lvl.spotTwoX && lvl.chestTwoY == lvl.spotTwoY)) // Sprawdza czy druga skrzynia znajduje się na miejscu docelowym
+     if ((lvl->chestTwoX == lvl->spotOneX && lvl->chestTwoY == lvl->spotOneY) || (lvl->chestTwoX == lvl->spotTwoX && lvl->chestTwoY == lvl->spotTwoY)) // Sprawdza czy druga skrzynia znajduje się na miejscu docelowym
      {
-          lvl.chestPictoGood = 36;
+          lvl->chestPictoTwo = 36;
      }
      else
-          lvl.chestPictoGood = 35;
+          lvl->chestPictoTwo = 35;
 }
 
-void schowSteps(int *heroX, int *heroY, int *tempX, int *tempY, int steps, int *stepsUsed, int pastMoves[tabX][tabY], int *counter, bool flag) // Wyświetlanie liczby kroków i logika związana z krokami
+void schowSteps(level *lvl, int *stepsUsed, int pastMoves[tabX][tabY], int *counter, bool flag) // Wyświetlanie liczby kroków i logika związana z krokami
 {
      int stepsLeft;
 
-     if (*heroX != *tempX || *heroY != *tempY)
+     if (lvl->heroX != lvl->tempX || lvl->heroY != lvl->tempY)
      {
           if (flag == false)
           {
                (*counter)++;
           }
 
-          pastMoves[*counter - 1][0] = *tempX;
-          pastMoves[*counter - 1][1] = *tempY;
+          pastMoves[*counter - 1][0] = lvl->tempX;
+          pastMoves[*counter - 1][1] = lvl->tempY;
 
-          *tempX = *heroX;
-          *tempY = *heroY;
+          lvl->tempX = lvl->heroX;
+          lvl->tempY = lvl->heroY;
           (*stepsUsed)++;
 
           if (*counter == 10)
@@ -301,17 +302,17 @@ void schowSteps(int *heroX, int *heroY, int *tempX, int *tempY, int steps, int *
           }
      }
 
-     stepsLeft = steps - *stepsUsed;
+     stepsLeft = lvl->steps - *stepsUsed;
      cout << "Pozostalo krokow: " << stepsLeft << " \n";
 
-     for (int i = 0; i < 10; i++)
-     {
-          for (int j = 0; j < 2; j++)
-          {
-               cout << pastMoves[i][j] << " ";
-          }
-          cout << "\n";
-     }
+     // for (int i = 0; i < 10; i++)
+     // {
+     //      for (int j = 0; j < 2; j++)
+     //      {
+     //           cout << pastMoves[i][j] << " ";
+     //      }
+     //      cout << "\n";
+     // }
 
      if (stepsLeft == 0)
      {
@@ -342,15 +343,15 @@ void genLevel(char tab[mapY][mapX], level lvl, level lvl1, level lvl2, level lvl
      while (1)
      {
           fillMap(tab, lvl.fileName);
-          genBlock(lvl.spotOneY, lvl.spotOneX, tab, 0, &lvl.chestPictoBad);
-          genBlock(lvl.spotTwoY, lvl.spotTwoX, tab, 0, &lvl.chestPictoGood);
-          genBlock(lvl.heroY, lvl.heroX, tab, 2, &lvl.chestPictoBad);
-          genBlock(lvl.chestOneY, lvl.chestOneX, tab, 1, &lvl.chestPictoBad);
-          genBlock(lvl.chestTwoY, lvl.chestTwoX, tab, 1, &lvl.chestPictoGood);
+          genBlock(lvl.spotOneY, lvl.spotOneX, tab, 0, &lvl.chestPictoOne);
+          genBlock(lvl.spotTwoY, lvl.spotTwoX, tab, 0, &lvl.chestPictoTwo);
+          genBlock(lvl.heroY, lvl.heroX, tab, 2, &lvl.chestPictoOne);
+          genBlock(lvl.chestOneY, lvl.chestOneX, tab, 1, &lvl.chestPictoOne);
+          genBlock(lvl.chestTwoY, lvl.chestTwoX, tab, 1, &lvl.chestPictoTwo);
           genMap(tab, &lvl.camX, &lvl.camY);
-          schowSteps(&lvl.heroX, &lvl.heroY, &lvl.tempX, &lvl.tempY, lvl.steps, &lvl.stepsUsed, pastMoves, &counter, lastMoveUndo);
+          schowSteps(&lvl, &lvl.stepsUsed, pastMoves, &counter, lastMoveUndo);
           action(&lvl, lvl1, lvl2, lvl3, pastMoves, &counter, &z, &lastMoveUndo, tab);
-          winCheck(tab, &lvl.chestPictoBad, &lvl.chestPictoGood, lvl, lvl1, lvl2, lvl3);
+          winCheck(tab, lvl, lvl1, lvl2, lvl3);
      }
 }
 
@@ -638,5 +639,5 @@ void action(level *lvl, level lvl1, level lvl2, level lvl3, int pastMoves[tabX][
      {
      }
 
-     onSpot(*lvl);
+     onSpot(lvl);
 }
