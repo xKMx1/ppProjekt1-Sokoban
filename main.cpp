@@ -34,18 +34,29 @@ struct level
 
 const int mapX = 120;
 const int mapY = 35;
+const int replaySize = 10;
 
-void ClearScreen()
+level undoStack[replaySize];
+level redoStack[replaySize];
+
+int undoCounter = 0;
+int redoCounter = 0;
+
+void clearScreen()
 {
      COORD cursorPosition;
      cursorPosition.X = 0;
      cursorPosition.Y = 0;
      SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
 }
+
 void startScreen();
 void endScreen();
 void winScreen();
 void winCheck(int *chestPicto1, int *chestPicto2, level lvl1, level lvl2, level lvl3);
+void undo(level *poziom);
+void redo(level *poziom);
+void saveGameProgress(level *poziom);
 void fillTable(int tab[10][2]);
 void genBlock(int y, int x, char tab[mapY][mapX], int var, int *chest);
 void fillMap(char tab[mapY][mapX], char path[11]);
@@ -244,7 +255,7 @@ void fillMap(char tab[mapY][mapX], char path[11]) // funkcja wypełniająca map�
 
 void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY) // funkcja wypisujaca na ekran mapę
 {
-     ClearScreen();
+     clearScreen();
 
      for (int i = *cameraY; i < *cameraY + 25; i++)
      {
@@ -418,6 +429,49 @@ void genMenu(char tab[mapY][mapX], level lvl1, level lvl2, level lvl3)
                genMenu(tab, lvl1, lvl2, lvl3);
           }
      }
+}
+
+void undo(level *poziom)
+{
+     if (undoCounter > 1 && redoCounter < replaySize - 1)
+     {
+          undoCounter -= 1;
+
+          //      redoStack.push(*poziom);
+          redoStack[redoCounter % replaySize] = *poziom; // TODO sprawdzic czy to sie kopiuje
+          redoCounter++;
+
+          //      *poziom = undoStack.top();
+          //      undoStack.pop();
+          *poziom = undoStack[(undoCounter - 1) % replaySize];
+          undoCounter--;
+     }
+}
+
+void redo(level *poziom)
+{
+     // TODO dodac czyszczenie redoStack po ruchu?
+     if (redoCounter != 0)
+     {
+          undoCounter--;
+
+          //        undoStack.push(*poziom);
+          undoStack[(undoCounter - 1) % replaySize] = *poziom;
+
+          //        *poziom = redoStack.top();
+          //        redoStack.pop();
+          *poziom = redoStack[redoCounter - 1];
+          redoCounter--;
+     }
+}
+
+void saveGameProgress(level *poziom)
+{
+     //    undoStack.push(poziom);
+     //    copyGameStates(undoStack[undoCounter], *poziom);
+
+     undoStack[undoCounter % replaySize] = *poziom;
+     undoCounter++;
 }
 
 void action(int *y, int *x, int *cx1, int *cy1, int *cx2, int *cy2, int *sx1, int *sy1, int *sx2, int *sy2, int &chest1, int &chest2, int *cameraX, int *cameraY, level lvl1, level lvl2, level lvl3, int pastMoves[10][2], int *counter, char tab[mapY][mapX])
