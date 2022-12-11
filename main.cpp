@@ -20,12 +20,12 @@ struct level
      int spotOneY;
      int spotTwoX;
      int spotTwoY;
-     int chestPictoOne;
-     int chestPictoTwo;
+     int chestPictoOne = 35;
+     int chestPictoTwo = 35;
      int steps;
-     int stepsUsed;
-     int camX;
-     int camY;
+     int stepsUsed = 0;
+     int camX = 0;
+     int camY = 0;
      bool locked;
 };
 
@@ -36,11 +36,11 @@ void startScreen();
 void endScreen();
 void winScreen();
 void winCheck(int *chestPicto1, int *chestPicto2, level lvl1, level lvl2, level lvl3);
-void genBlock(int y, int x, char tab[mapY][mapX], int var, int *chest);
+void genBlock(int y, int x, char tab[mapY][mapX], int var, int chest);
 void fillMap(char tab[mapY][mapX], char path[11]);
-void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY);
+void genMap(char tab[mapY][mapX], int cameraX, int cameraY);
 void onSpot(level *lvl);
-void schowSteps(level *lvl, int *stepsUsed, int *counter, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]);
+void showSteps(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]);
 void genLevel(char tab[mapY][mapX], level lvl, level lvl1, level lvl2, level lvl3);
 void genMenu(char tab[mapY][mapX], level lvl1, level lvl2, level lvl3);
 void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]);
@@ -66,12 +66,7 @@ int main()
      lvlOne.spotOneY = 5;
      lvlOne.spotTwoX = 30;
      lvlOne.spotTwoY = 5;
-     lvlOne.chestPictoOne = 35;
-     lvlOne.chestPictoTwo = 35;
      lvlOne.steps = 50;
-     lvlOne.stepsUsed = 0;
-     lvlOne.camX = 0;
-     lvlOne.camY = 0;
      lvlOne.locked = false;
 
      lvlTwo.lvlId = 2; // Definicja wartości dla drugiego poziomu
@@ -90,9 +85,6 @@ int main()
      lvlTwo.chestPictoOne = 35;
      lvlTwo.chestPictoTwo = 35;
      lvlTwo.steps = 160;
-     lvlTwo.stepsUsed = 0;
-     lvlTwo.camX = 0;
-     lvlTwo.camY = 0;
      lvlTwo.locked = true;
 
      lvlThree.lvlId = 3; // Definicja wartości dla trzeciego poziomu
@@ -111,12 +103,9 @@ int main()
      lvlThree.chestPictoOne = 35;
      lvlThree.chestPictoTwo = 35;
      lvlThree.steps = 130;
-     lvlThree.stepsUsed = 0;
-     lvlThree.camX = 0;
-     lvlThree.camY = 0;
      lvlThree.locked = true;
 
-     // startScreen();
+     startScreen();
 
      genMenu(mainMap, lvlOne, lvlTwo, lvlThree);
 
@@ -127,18 +116,28 @@ void startScreen() // funkcja wyswietlajaca ekran powitalny
 {
      system("CLS");
 
-     cout << "  /$$$$$$            /$$                 /$$                          " << endl;
-     cout << " /$$__  $$          | $$                | $$                          " << endl;
-     cout << "| $$  \\__/  /$$$$$$ | $$   /$$  /$$$$$$ | $$$$$$$   /$$$$$$  /$$$$$$$ " << endl;
-     cout << "|  $$$$$$  /$$__  $$| $$  /$$/ /$$__  $$| $$__  $$ |____  $$| $$__  $$" << endl;
-     cout << " \\____  $$| $$  \\ $$| $$$$$$/ | $$  \\ $$| $$  \\ $$  /$$$$$$$| $$  \\ $$" << endl;
-     cout << " /$$  \\ $$| $$  | $$| $$_  $$ | $$  | $$| $$  | $$ /$$__  $$| $$  | $$" << endl;
-     cout << "|  $$$$$$/|  $$$$$$/| $$ \\  $$|  $$$$$$/| $$$$$$$/|  $$$$$$$| $$  | $$" << endl;
-     cout << " \\______/  \\______/ |__/  \\__/ \\______/ |_______/  \\_______/|__/  |__/" << endl
-          << endl;
-     cout << "                        Kamil Ratajczyk s193345" << endl
-          << endl;
-     cout << "                   Wyslij dowolny znak aby rozpoczac" << endl;
+     cout << "  /$$$$$$            /$$                 /$$                          "
+          << "\n";
+     cout << " /$$__  $$          | $$                | $$                          "
+          << "\n";
+     cout << "| $$  \\__/  /$$$$$$ | $$   /$$  /$$$$$$ | $$$$$$$   /$$$$$$  /$$$$$$$ "
+          << "\n";
+     cout << "|  $$$$$$  /$$__  $$| $$  /$$/ /$$__  $$| $$__  $$ |____  $$| $$__  $$"
+          << "\n";
+     cout << " \\____  $$| $$  \\ $$| $$$$$$/ | $$  \\ $$| $$  \\ $$  /$$$$$$$| $$  \\ $$"
+          << "\n";
+     cout << " /$$  \\ $$| $$  | $$| $$_  $$ | $$  | $$| $$  | $$ /$$__  $$| $$  | $$"
+          << "\n";
+     cout << "|  $$$$$$/|  $$$$$$/| $$ \\  $$|  $$$$$$/| $$$$$$$/|  $$$$$$$| $$  | $$"
+          << "\n";
+     cout << " \\______/  \\______/ |__/  \\__/ \\______/ |_______/  \\_______/|__/  |__/"
+          << "\n"
+          << "\n";
+     cout << "                        Kamil Ratajczyk s193345"
+          << "\n"
+          << "\n";
+     cout << "                   Wyslij dowolny znak aby rozpoczac"
+          << "\n";
      getchar();
      fflush(stdin);
 }
@@ -195,23 +194,23 @@ void winCheck(char tab[mapY][mapX], level lvl, level lvl1, level lvl2, level lvl
      }
 }
 
-void genBlock(int y, int x, char tab[mapY][mapX], int var, int *chest) // funkcja generująca blok w podanym miejscu
+void genBlock(int y, int x, char tab[mapY][mapX], int var, int chest) // funkcja generująca blok w podanym miejscu
 {
-     for (int i = 0; i < 3; i++) // generujemy blok 3x3 razem z koleinym forem
+     for (int i = 0; i < 3; i++)
      {
           for (int j = 0; j < 3; j++)
           {
                if (var == 0) // jeśli zostało podane 0 na wejście generujemy miejsce spotu
                {
-                    tab[y + i][x + j] = 33;
+                    tab[y + i][x + j] = char(33);
                }
                else if (var == 1) // jeśli została podana na wejście jedynka generujemy skrzynię
                {
-                    tab[y + i][x + j] = *chest;
+                    tab[y + i][x + j] = char(chest);
                }
                else if (var == 2) // jeśli została podana na wejście dwójka generujemy bohatera
                {
-                    tab[y + i][x + j] = 135;
+                    tab[y + i][x + j] = char(64);
                }
           }
      }
@@ -244,20 +243,20 @@ void fillMap(char tab[mapY][mapX], int x) // funkcja wypełniająca mapę danymi
      {
           for (int j = 0; j < mapX; j++)
           {
-               tab[i][j] = file.get();
+               tab[i][j] = char(file.get());
           }
      }
 
      file.close();
 }
 
-void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY) // funkcja wypisujaca na ekran mapę
+void genMap(char tab[mapY][mapX], int cameraX, int cameraY) // funkcja wypisujaca na ekran mapę
 {
      system("CLS");
 
-     for (int i = *cameraY; i < *cameraY + 25; i++)
+     for (int i = cameraY; i < cameraY + 25; i++)
      {
-          for (int j = *cameraX; j < *cameraX + 80; j++)
+          for (int j = cameraX; j < cameraX + 80; j++)
           {
                cout << tab[i][j];
           }
@@ -268,8 +267,8 @@ void genMap(char tab[mapY][mapX], int *cameraX, int *cameraY) // funkcja wypisuj
 
 void onSpot(level *lvl) // funkcja sprawdzająca położenie skrzyń
 {
-     if ((lvl->chestOneX == lvl->spotOneX && lvl->chestOneY == lvl->spotOneY) || (lvl->chestOneX == lvl->spotTwoX && lvl->chestOneY == lvl->spotTwoY)) // Sprawdza czy pierwsza skrzynia znajduje się na miejscu docelowym
-     {                                                                                                                                                 // Zamieniamy tutaj piktogram skrzyni
+     if ((lvl->chestOneX == lvl->spotOneX && lvl->chestOneY == lvl->spotOneY) || (lvl->chestOneX == lvl->spotTwoX && lvl->chestOneY == lvl->spotTwoY))
+     {
           lvl->chestPictoOne = 36;
      }
      else
@@ -283,20 +282,19 @@ void onSpot(level *lvl) // funkcja sprawdzająca położenie skrzyń
           lvl->chestPictoTwo = 35;
 }
 
-void schowSteps(level *lvl, int *stepsUsed, int *counter, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]) // Wyświetlanie liczby kroków i logika związana z krokami
+void showSteps(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]) // Wyświetlanie liczby kroków i logika związana z krokami
 {
      int stepsLeft;
 
      if (lvl->heroX != lvl->tempX || lvl->heroY != lvl->tempY)
      {
-          (*counter)++;
-          (*stepsUsed)++;
+          (lvl->stepsUsed)++;
 
           lvl->tempX = lvl->heroX;
           lvl->tempY = lvl->heroY;
      }
 
-     stepsLeft = lvl->steps - *stepsUsed;
+     stepsLeft = lvl->steps - lvl->stepsUsed;
      cout << "Pozostalo krokow: " << stepsLeft << " \n";
 
      if (stepsLeft == 0)
@@ -307,18 +305,16 @@ void schowSteps(level *lvl, int *stepsUsed, int *counter, level lvl1, level lvl2
 
 void genLevel(char tab[mapY][mapX], level lvl, level lvl1, level lvl2, level lvl3)
 {
-     int counter = 0;
-
      while (1)
      {
           fillMap(tab, lvl.lvlId);
-          genBlock(lvl.spotOneY, lvl.spotOneX, tab, 0, &lvl.chestPictoOne);
-          genBlock(lvl.spotTwoY, lvl.spotTwoX, tab, 0, &lvl.chestPictoTwo);
-          genBlock(lvl.heroY, lvl.heroX, tab, 2, &lvl.chestPictoOne);
-          genBlock(lvl.chestOneY, lvl.chestOneX, tab, 1, &lvl.chestPictoOne);
-          genBlock(lvl.chestTwoY, lvl.chestTwoX, tab, 1, &lvl.chestPictoTwo);
-          genMap(tab, &lvl.camX, &lvl.camY);
-          schowSteps(&lvl, &lvl.stepsUsed, &counter, lvl1, lvl2, lvl3, tab);
+          genBlock(lvl.spotOneY, lvl.spotOneX, tab, 0, lvl.chestPictoOne);
+          genBlock(lvl.spotTwoY, lvl.spotTwoX, tab, 0, lvl.chestPictoTwo);
+          genBlock(lvl.heroY, lvl.heroX, tab, 2, lvl.chestPictoOne);
+          genBlock(lvl.chestOneY, lvl.chestOneX, tab, 1, lvl.chestPictoOne);
+          genBlock(lvl.chestTwoY, lvl.chestTwoX, tab, 1, lvl.chestPictoTwo);
+          genMap(tab, lvl.camX, lvl.camY);
+          showSteps(&lvl, lvl1, lvl2, lvl3, tab);
           action(&lvl, lvl1, lvl2, lvl3, tab);
           winCheck(tab, lvl, lvl1, lvl2, lvl3);
      }
@@ -337,9 +333,8 @@ void genMenu(char tab[mapY][mapX], level lvl1, level lvl2, level lvl3)
      while (1)
      {
           char znak;
-          char holder;
           int dot1 = 248, dot2 = 248;
-          znak = getchar();
+          znak = char(getchar());
 
           if (lvl2.locked == false) // odpowiada za kropki w menu sygnalizujace czy odblokowalismy poziom
           {
@@ -356,14 +351,14 @@ void genMenu(char tab[mapY][mapX], level lvl1, level lvl2, level lvl3)
                system("CLS");
                cout << "Wybierz: "
                     << "\n"
-                    << "(1) Poziom 1 " << static_cast<char>(42)
+                    << "(1) Poziom 1 " << char(42)
                     << "\n"
-                    << "(2) Poziom 2 " << static_cast<char>(dot1)
+                    << "(2) Poziom 2 " << char(dot1)
                     << "\n"
-                    << "(3) Poziom 3 " << static_cast<char>(dot2)
+                    << "(3) Poziom 3 " << char(dot2)
                     << "\n";
 
-               znak = getchar();
+               znak = char(getchar());
                if (znak == 49)
                {
                     genLevel(tab, lvl1, lvl1, lvl2, lvl3);
@@ -423,9 +418,7 @@ void genMenu(char tab[mapY][mapX], level lvl1, level lvl2, level lvl3)
 void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX])
 {
      cout << "Wprowadz znak: ";
-     char znak = getchar();
-
-     cout << znak;
+     char znak = char(getchar());
 
      if (znak == 119 || znak == 87) // instrukcje dla "W" i "w" RUCH GÓRA
      {
@@ -433,7 +426,7 @@ void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]
           {
                if (lvl->heroY == lvl->chestOneY + 3 && lvl->heroX == lvl->chestOneX) // sprawdzamy czy nie stoi obok nas skrzynia 1
                {
-                    if ((tab[lvl->heroY - 4][lvl->heroX] != 48) && (tab[lvl->heroY - 4][lvl->heroX] != 35) && (tab[lvl->heroY - 4][lvl->heroX] != 36)) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if ((tab[lvl->heroY - 4][lvl->heroX] != 48) && (tab[lvl->heroY - 4][lvl->heroX] != lvl->chestPictoTwo)) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          lvl->heroY -= 3;
                          lvl->chestOneY -= 3;
@@ -441,7 +434,7 @@ void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]
                }
                else if (lvl->heroY == lvl->chestTwoY + 3 && lvl->heroX == lvl->chestTwoX) // sprawdzamy czy nie stoi obok nas skrzynia 2
                {
-                    if (tab[lvl->heroY - 4][lvl->heroX] != 48 && (tab[lvl->heroY - 4][lvl->heroX] != 35) && (tab[lvl->heroY - 4][lvl->heroX] != 36)) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY - 4][lvl->heroX] != 48 && (tab[lvl->heroY - 4][lvl->heroX] != lvl->chestPictoOne)) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          lvl->heroY -= 3;
                          lvl->chestTwoY -= 3;
@@ -460,7 +453,7 @@ void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]
           {
                if (lvl->heroY == lvl->chestOneY - 3 && lvl->heroX == lvl->chestOneX) // sprawdzamy czy nie stoi obok nas skrzynia 1
                {
-                    if (tab[lvl->heroY + 6][lvl->heroX] != 48 && tab[lvl->heroY + 6][lvl->heroX] != 35 && tab[lvl->heroY + 6][lvl->heroX] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY + 6][lvl->heroX] != 48 && tab[lvl->heroY + 6][lvl->heroX] != lvl->chestPictoTwo) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          lvl->heroY += 3;
                          lvl->chestOneY += 3;
@@ -468,7 +461,7 @@ void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]
                }
                else if (lvl->heroY == lvl->chestTwoY - 3 && lvl->heroX == lvl->chestTwoX) // sprawdzamy czy nie stoi obok nas skrzynia 2
                {
-                    if (tab[lvl->heroY + 6][lvl->heroX] != 48 && tab[lvl->heroY + 6][lvl->heroX] != 35 && tab[lvl->heroY + 6][lvl->heroX] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY + 6][lvl->heroX] != 48 && tab[lvl->heroY + 6][lvl->heroX] != lvl->chestPictoOne) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          lvl->heroY += 3;
                          lvl->chestTwoY += 3;
@@ -488,7 +481,7 @@ void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]
 
                if (lvl->heroY == lvl->chestOneY && lvl->heroX == (lvl->chestOneX + 3)) // sprawdzamy czy nie stoi obok nas skrzynia 1
                {
-                    if (tab[lvl->heroY][lvl->heroX - 4] != 48 && tab[lvl->heroY][lvl->heroX - 4] != 35 && tab[lvl->heroY][lvl->heroX - 4] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY][lvl->heroX - 4] != 48 && tab[lvl->heroY][lvl->heroX - 4] != lvl->chestPictoTwo) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          lvl->heroX -= 3;
                          lvl->chestOneX -= 3;
@@ -496,7 +489,7 @@ void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]
                }
                else if (lvl->heroY == lvl->chestTwoY && lvl->heroX == (lvl->chestTwoX + 3)) // sprawdzamy czy nie stoi obok nas skrzynia 2
                {
-                    if (tab[lvl->heroY][lvl->heroX - 4] != 48 && tab[lvl->heroY][lvl->heroX - 4] != 35 && tab[lvl->heroY][lvl->heroX - 4] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY][lvl->heroX - 4] != 48 && tab[lvl->heroY][lvl->heroX - 4] != lvl->chestPictoOne) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          lvl->heroX -= 3;
                          lvl->chestTwoX -= 3;
@@ -515,7 +508,7 @@ void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]
           {
                if (lvl->heroY == lvl->chestOneY && lvl->heroX == (lvl->chestOneX - 3)) // sprawdzamy czy nie stoi obok nas skrzynia 1
                {
-                    if (tab[lvl->heroY][lvl->heroX + 6] != 48 && tab[lvl->heroY][lvl->heroX + 6] != 35 && tab[lvl->heroY][lvl->heroX + 6] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY][lvl->heroX + 6] != 48 && tab[lvl->heroY][lvl->heroX + 6] != lvl->chestPictoTwo) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          lvl->heroX += 3;
                          lvl->chestOneX += 3;
@@ -523,7 +516,7 @@ void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]
                }
                else if (lvl->heroY == lvl->chestTwoY && lvl->heroX == (lvl->chestTwoX - 3)) // sprawdzamy czy nie stoi obok nas skrzynia 2
                {
-                    if (tab[lvl->heroY][lvl->heroX + 6] != 48 && tab[lvl->heroY][lvl->heroX + 6] != 35 && tab[lvl->heroY][lvl->heroX + 6] != 36) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
+                    if (tab[lvl->heroY][lvl->heroX + 6] != 48 && tab[lvl->heroY][lvl->heroX + 6] != lvl->chestPictoOne) // sprawdzamy czy nie wpychamy skrzymi w ścienę ani drugą skrzynię
                     {
                          lvl->heroX += 3;
                          lvl->chestTwoX += 3;
@@ -538,7 +531,7 @@ void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]
 
      if (znak == 106 || znak == 74) // instrukcja dla "J" i "j" KAMERA LEWO
      {
-          if (lvl->camX != 0) // ogranicza wyjście kamery za mapę
+          if (lvl->camX != 0)
           {
                (lvl->camX)--;
           }
@@ -546,7 +539,7 @@ void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]
 
      if (znak == 107 || znak == 75) // instrukcja dla "K" i "k" KAMERA PRAWO
      {
-          if (lvl->camX != 39) // ogranicza wyjście kamery za mapę
+          if (lvl->camX != 39)
           {
                (lvl->camX)++;
           }
@@ -554,7 +547,7 @@ void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]
 
      if (znak == 105 || znak == 73) // instrukcja dla "I" i "i" KAMERA GÓRA
      {
-          if (lvl->camY != 0) // ogranicza wyjście kamery za mapę
+          if (lvl->camY != 0)
           {
                (lvl->camY)--;
           }
@@ -562,7 +555,7 @@ void action(level *lvl, level lvl1, level lvl2, level lvl3, char tab[mapY][mapX]
 
      if (znak == 109 || znak == 77) // instrukcja dla "M" i "m" KAMERA DÓŁ
      {
-          if (lvl->camY != 10) // ogranicza wyjście kamery za mapę
+          if (lvl->camY != 10)
           {
                (lvl->camY)++;
           }
